@@ -1,5 +1,5 @@
 #include <Wire.h>
-#include "MCP23008.h"
+#include "Adafruit_MCP23008.h"
 
 // Basic toggle test for i/o expansion. flips pin #0 of a MCP23008 i2c
 // pin expander up and down. Public domain
@@ -12,7 +12,7 @@
 
 // Output #0 is on pin 10 so connect an LED or whatever from that to ground
 
-MCP23008 mcp;
+Adafruit_MCP23008 mcp;
   
 void setup() {  
   mcp.begin();      // use default address 0

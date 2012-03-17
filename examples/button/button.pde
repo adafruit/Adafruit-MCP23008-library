@@ -1,5 +1,5 @@
 #include <Wire.h>
-#include "MCP23008.h"
+#include "Adafruit_MCP23008.h"
 
 // Basic pin reading and pullup test for the MCP23008 I/O expander
 // public domain!
@@ -12,7 +12,7 @@
 
 // Input #0 is on pin 10 so connect a button or switch from there to ground
 
-MCP23008 mcp;
+Adafruit_MCP23008 mcp;
   
 void setup() {  
   mcp.begin();      // use default address 0
