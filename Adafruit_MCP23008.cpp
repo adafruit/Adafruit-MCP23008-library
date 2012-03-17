@@ -1,5 +1,15 @@
-// Code by Adafruit Industries/Limor Fried
-// License: LGPL
+/*************************************************** 
+  This is a library for the MCP23008 i2c port expander
+
+  These displays use I2C to communicate, 2 pins are required to  
+  interface
+  Adafruit invests time and resources providing this open source code, 
+  please support Adafruit and open-source hardware by purchasing 
+  products from Adafruit!
+
+  Written by Limor Fried/Ladyada for Adafruit Industries.  
+  BSD license, all text above must be included in any redistribution
+ ****************************************************/
 
 #if ARDUINO >= 100
  #include "Arduino.h"
@@ -8,13 +18,13 @@
 #endif
 #include <Wire.h>
 #include <avr/pgmspace.h>
-#include "MCP23008.h"
+#include "Adafruit_MCP23008.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // RTC_DS1307 implementation
 
-void MCP23008::begin(uint8_t addr) {
+void Adafruit_MCP23008::begin(uint8_t addr) {
   if (addr > 7) {
     addr = 7;
   }
@@ -53,11 +63,11 @@ void MCP23008::begin(uint8_t addr) {
 
 }
 
-void MCP23008::begin(void) {
+void Adafruit_MCP23008::begin(void) {
   begin(0);
 }
 
-void MCP23008::pinMode(uint8_t p, uint8_t d) {
+void Adafruit_MCP23008::pinMode(uint8_t p, uint8_t d) {
   uint8_t iodir;
   
 
@@ -78,17 +88,17 @@ void MCP23008::pinMode(uint8_t p, uint8_t d) {
   write8(MCP23008_IODIR, iodir);
 }
 
-uint8_t MCP23008::readGPIO(void) {
+uint8_t Adafruit_MCP23008::readGPIO(void) {
   // read the current GPIO output latches
   return read8(MCP23008_OLAT);
 }
 
-void MCP23008::writeGPIO(uint8_t gpio) {
+void Adafruit_MCP23008::writeGPIO(uint8_t gpio) {
   write8(MCP23008_GPIO, gpio);
 }
 
 
-void MCP23008::digitalWrite(uint8_t p, uint8_t d) {
+void Adafruit_MCP23008::digitalWrite(uint8_t p, uint8_t d) {
   uint8_t gpio;
   
   // only 8 bits!
@@ -109,7 +119,7 @@ void MCP23008::digitalWrite(uint8_t p, uint8_t d) {
   writeGPIO(gpio);
 }
 
-void MCP23008::pullUp(uint8_t p, uint8_t d) {
+void Adafruit_MCP23008::pullUp(uint8_t p, uint8_t d) {
   uint8_t gppu;
   
   // only 8 bits!
@@ -127,7 +137,7 @@ void MCP23008::pullUp(uint8_t p, uint8_t d) {
   write8(MCP23008_GPPU, gppu);
 }
 
-uint8_t MCP23008::digitalRead(uint8_t p) {
+uint8_t Adafruit_MCP23008::digitalRead(uint8_t p) {
   // only 8 bits!
   if (p > 7)
     return 0;
@@ -136,7 +146,7 @@ uint8_t MCP23008::digitalRead(uint8_t p) {
   return (readGPIO() >> p) & 0x1;
 }
 
-uint8_t MCP23008::read8(uint8_t addr) {
+uint8_t Adafruit_MCP23008::read8(uint8_t addr) {
   Wire.beginTransmission(MCP23008_ADDRESS | i2caddr);
 #if ARDUINO >= 100
   Wire.write((byte)addr);	
@@ -154,7 +164,7 @@ uint8_t MCP23008::read8(uint8_t addr) {
 }
 
 
-void MCP23008::write8(uint8_t addr, uint8_t data) {
+void Adafruit_MCP23008::write8(uint8_t addr, uint8_t data) {
   Wire.beginTransmission(MCP23008_ADDRESS | i2caddr);
 #if ARDUINO >= 100
   Wire.write((byte)addr);

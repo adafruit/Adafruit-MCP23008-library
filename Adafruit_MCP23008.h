@@ -1,11 +1,20 @@
-// i2c expander library - slow I/O!
+/*************************************************** 
+  This is a library for the MCP23008 i2c port expander
 
-// also works with the MCP23009
+  These displays use I2C to communicate, 2 pins are required to  
+  interface
+  Adafruit invests time and resources providing this open source code, 
+  please support Adafruit and open-source hardware by purchasing 
+  products from Adafruit!
+
+  Written by Limor Fried/Ladyada for Adafruit Industries.  
+  BSD license, all text above must be included in any redistribution
+ ****************************************************/
 
 #ifndef _ADAFRUIT_MCP23008_H
 #define _ADAFRUIT_MCP23008_H
 // Don't forget the Wire library
-class MCP23008 {
+class Adafruit_MCP23008 {
 public:
   void begin(uint8_t addr);
   void begin(void);
