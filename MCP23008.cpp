@@ -64,22 +64,8 @@ void MCP23008::pinMode(uint8_t p, uint8_t d) {
   // only 8 bits!
   if (p > 7)
     return;
-
-  // read the current IODIR
-  Wire.beginTransmission(MCP23008_ADDRESS | i2caddr);
-#if ARDUINO >= 100
-  Wire.write((byte)MCP23008_IODIR);	
-#else
-  Wire.send(MCP23008_IODIR);	
-#endif
-  Wire.endTransmission();
   
-  Wire.requestFrom(MCP23008_ADDRESS | i2caddr, 1);
-#if ARDUINO >= 100
-  iodir = Wire.read();
-#else
-  iodir = Wire.receive();
-#endif
+  iodir = read8(MCP23008_IODIR);
 
   // set the pin and direction
   if (d == INPUT) {
@@ -89,15 +75,16 @@ void MCP23008::pinMode(uint8_t p, uint8_t d) {
   }
 
   // write the new IODIR
-  Wire.beginTransmission(MCP23008_ADDRESS | i2caddr);
-#if ARDUINO >= 100
-  Wire.write((byte)MCP23008_IODIR);
-  Wire.write((byte)iodir);	
-#else
-  Wire.send(MCP23008_IODIR);
-  Wire.send(iodir);	
-#endif
-  Wire.endTransmission();
+  write8(MCP23008_IODIR, iodir);
+}
+
+uint8_t MCP23008::readGPIO(void) {
+  // read the current GPIO output latches
+  return read8(MCP23008_OLAT);
+}
+
+void MCP23008::writeGPIO(uint8_t gpio) {
+  write8(MCP23008_GPIO, gpio);
 }
 
 
@@ -109,20 +96,7 @@ void MCP23008::digitalWrite(uint8_t p, uint8_t d) {
     return;
 
   // read the current GPIO output latches
-  Wire.beginTransmission(MCP23008_ADDRESS | i2caddr);
-#if ARDUINO >= 100
-  Wire.write((byte)MCP23008_OLAT);	
-#else
-  Wire.send(MCP23008_OLAT);	
-#endif
-  Wire.endTransmission();
-  
-  Wire.requestFrom(MCP23008_ADDRESS | i2caddr, 1);
-#if ARDUINO >= 100
-  gpio = Wire.read();
-#else
-  gpio = Wire.receive();
-#endif
+  gpio = readGPIO();
 
   // set the pin and direction
   if (d == HIGH) {
@@ -132,15 +106,7 @@ void MCP23008::digitalWrite(uint8_t p, uint8_t d) {
   }
 
   // write the new GPIO
-  Wire.beginTransmission(MCP23008_ADDRESS | i2caddr);
-#if ARDUINO >= 100
-  Wire.write((byte)MCP23008_GPIO);
-  Wire.write((byte)gpio);	
-#else
-  Wire.send(MCP23008_GPIO);
-  Wire.send(gpio);	
-#endif
-  Wire.endTransmission();
+  writeGPIO(gpio);
 }
 
 void MCP23008::pullUp(uint8_t p, uint8_t d) {
@@ -150,39 +116,15 @@ void MCP23008::pullUp(uint8_t p, uint8_t d) {
   if (p > 7)
     return;
 
-  // read the current pullup resistor set
-  Wire.beginTransmission(MCP23008_ADDRESS | i2caddr);
-#if ARDUINO >= 100
-  Wire.write((byte)MCP23008_GPPU);	
-#else
-  Wire.send(MCP23008_GPPU);	
-#endif
-  Wire.endTransmission();
-  
-  Wire.requestFrom(MCP23008_ADDRESS | i2caddr, 1);
-#if ARDUINO >= 100
-  gppu = Wire.read();
-#else
-  gppu = Wire.receive();
-#endif
-
+  gppu = read8(MCP23008_GPPU);
   // set the pin and direction
   if (d == HIGH) {
     gppu |= 1 << p; 
   } else {
     gppu &= ~(1 << p);
   }
-
   // write the new GPIO
-  Wire.beginTransmission(MCP23008_ADDRESS | i2caddr);
-#if ARDUINO >= 100
-  Wire.write((byte)MCP23008_GPPU);
-  Wire.write((byte)gppu);	
-#else
-  Wire.send(MCP23008_GPPU);
-  Wire.send(gppu);	
-#endif
-  Wire.endTransmission();
+  write8(MCP23008_GPPU, gppu);
 }
 
 uint8_t MCP23008::digitalRead(uint8_t p) {
@@ -191,18 +133,35 @@ uint8_t MCP23008::digitalRead(uint8_t p) {
     return 0;
 
   // read the current GPIO
+  return (readGPIO() >> p) & 0x1;
+}
+
+uint8_t MCP23008::read8(uint8_t addr) {
   Wire.beginTransmission(MCP23008_ADDRESS | i2caddr);
 #if ARDUINO >= 100
-  Wire.write((byte)MCP23008_GPIO);	
+  Wire.write((byte)addr);	
 #else
-  Wire.send(MCP23008_GPIO);	
+  Wire.send(addr);	
 #endif
   Wire.endTransmission();
-  
   Wire.requestFrom(MCP23008_ADDRESS | i2caddr, 1);
+
 #if ARDUINO >= 100
-  return (Wire.read() >> p) & 0x1;
+  return Wire.read();
 #else
-  return (Wire.receive() >> p) & 0x1;
+  return Wire.receive();
 #endif
+}
+
+
+void MCP23008::write8(uint8_t addr, uint8_t data) {
+  Wire.beginTransmission(MCP23008_ADDRESS | i2caddr);
+#if ARDUINO >= 100
+  Wire.write((byte)addr);
+  Wire.write((byte)data);
+#else
+  Wire.send(addr);	
+  Wire.send(data);
+#endif
+  Wire.endTransmission();
 }
