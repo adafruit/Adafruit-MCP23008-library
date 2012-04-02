@@ -90,25 +90,11 @@ void Adafruit_MCP23008::writeGPIO(uint8_t gpio) {
 }
 
 
-void Adafruit_MCP23008::digitalWrite(uint8_t p, uint8_t d) {
-  uint8_t gpio;
-  
-  // only 8 bits!
-  if (p > 7)
+void Adafruit_MCP23008::digitalWrite(uint8_t portNumber, uint8_t writeValue) {
+  if (portNumber > 7)
     return;
 
-  // read the current GPIO output latches
-  gpio = readGPIO();
-
-  // set the pin and direction
-  if (d == HIGH) {
-    gpio |= 1 << p; 
-  } else {
-    gpio &= ~(1 << p);
-  }
-
-  // write the new GPIO
-  writeGPIO(gpio);
+  writeGPIO(setIfHigh(readGPIO(), portNumber, writeValue));
 }
 
 void Adafruit_MCP23008::pullUp(uint8_t portNumber, uint8_t writeValue) {
