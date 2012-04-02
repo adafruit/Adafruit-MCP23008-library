@@ -20,6 +20,13 @@
 #include <avr/pgmspace.h>
 #include "Adafruit_MCP23008.h"
 
+#if ARDUINO >= 100
+#define WireWrite(b) Wire.write((byte)b)
+#define WireRead() Wire.read()
+#else
+#define WireWrite(b) Wire.send(b)
+#define WireRead() Wire.receive()
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 // RTC_DS1307 implementation
@@ -34,33 +41,18 @@ void Adafruit_MCP23008::begin(uint8_t addr) {
 
   // set defaults!
   Wire.beginTransmission(MCP23008_ADDRESS | i2caddr);
-#if ARDUINO >= 100
-  Wire.write((byte)MCP23008_IODIR);
-  Wire.write((byte)0xFF);  // all inputs
-  Wire.write((byte)0x00);
-  Wire.write((byte)0x00);
-  Wire.write((byte)0x00);
-  Wire.write((byte)0x00);
-  Wire.write((byte)0x00);
-  Wire.write((byte)0x00);
-  Wire.write((byte)0x00);
-  Wire.write((byte)0x00);
-  Wire.write((byte)0x00);	
-#else
-  Wire.send(MCP23008_IODIR);
-  Wire.send(0xFF);  // all inputs
-  Wire.send(0x00);
-  Wire.send(0x00);
-  Wire.send(0x00);
-  Wire.send(0x00);
-  Wire.send(0x00);
-  Wire.send(0x00);
-  Wire.send(0x00);
-  Wire.send(0x00);
-  Wire.send(0x00);	
-#endif
+  WireWrite(MCP23008_IODIR);
+  WireWrite(0xFF);
+  WireWrite(0x00);
+  WireWrite(0x00);
+  WireWrite(0x00);
+  WireWrite(0x00);
+  WireWrite(0x00);
+  WireWrite(0x00);
+  WireWrite(0x00);
+  WireWrite(0x00);
+  WireWrite(0x00);	
   Wire.endTransmission();
-
 }
 
 void Adafruit_MCP23008::begin(void) {
@@ -148,30 +140,18 @@ uint8_t Adafruit_MCP23008::digitalRead(uint8_t p) {
 
 uint8_t Adafruit_MCP23008::read8(uint8_t addr) {
   Wire.beginTransmission(MCP23008_ADDRESS | i2caddr);
-#if ARDUINO >= 100
-  Wire.write((byte)addr);	
-#else
-  Wire.send(addr);	
-#endif
+  WireWrite(addr);	
   Wire.endTransmission();
   Wire.requestFrom(MCP23008_ADDRESS | i2caddr, 1);
 
-#if ARDUINO >= 100
-  return Wire.read();
-#else
-  return Wire.receive();
-#endif
+
+  return WireRead();
 }
 
 
 void Adafruit_MCP23008::write8(uint8_t addr, uint8_t data) {
   Wire.beginTransmission(MCP23008_ADDRESS | i2caddr);
-#if ARDUINO >= 100
-  Wire.write((byte)addr);
-  Wire.write((byte)data);
-#else
-  Wire.send(addr);	
-  Wire.send(data);
-#endif
+  WireWrite(addr);
+  WireWrite(data);
   Wire.endTransmission();
 }
