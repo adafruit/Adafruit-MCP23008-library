@@ -88,9 +88,9 @@ void Adafruit_MCP23008::pinMode(uint8_t p, uint8_t d) {
   write8(MCP23008_IODIR, iodir);
 }
 
+// read the current GPIO value
 uint8_t Adafruit_MCP23008::readGPIO(void) {
-  // read the current GPIO output latches
-  return read8(MCP23008_OLAT);
+  return read8(MCP23008_GPIO);
 }
 
 void Adafruit_MCP23008::writeGPIO(uint8_t gpio) {
