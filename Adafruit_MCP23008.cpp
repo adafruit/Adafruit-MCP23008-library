@@ -68,6 +68,10 @@ static uint8_t setIfInput(uint8_t original, uint8_t position, uint8_t direction)
   return withValueAtPositionToggled(original, position, direction == INPUT);
 }
 
+static uint8_t setIfHigh(uint8_t original, uint8_t position, uint8_t writeValue) {
+  return withValueAtPositionToggled(original, position, writeValue == HIGH);
+}
+
 void Adafruit_MCP23008::pinMode(uint8_t portNumber, uint8_t direction) {
   // only 8 bits!
   if (portNumber > 7)
@@ -107,22 +111,12 @@ void Adafruit_MCP23008::digitalWrite(uint8_t p, uint8_t d) {
   writeGPIO(gpio);
 }
 
-void Adafruit_MCP23008::pullUp(uint8_t p, uint8_t d) {
-  uint8_t gppu;
-  
+void Adafruit_MCP23008::pullUp(uint8_t portNumber, uint8_t writeValue) {
   // only 8 bits!
-  if (p > 7)
+  if (portNumber > 7)
     return;
 
-  gppu = read8(MCP23008_GPPU);
-  // set the pin and direction
-  if (d == HIGH) {
-    gppu |= 1 << p; 
-  } else {
-    gppu &= ~(1 << p);
-  }
-  // write the new GPIO
-  write8(MCP23008_GPPU, gppu);
+  write8(MCP23008_GPPU, setIfHigh(read8(MCP23008_GPPU), portNumber, writeValue));
 }
 
 uint8_t Adafruit_MCP23008::digitalRead(uint8_t p) {
