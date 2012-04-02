@@ -1,8 +1,9 @@
 #include <Wire.h>
 #include "Adafruit_MCP23008.h"
 
-// Basic test for i/o expansion. flips pin #0 of a MCP23008 i2c
-// checking on pin 8 of the arduino that its state is as expected.
+// Test i/o expansion. 
+// Checks all 8 pins of MCP23008 as outputs then as inputs
+// Does not yet test pull ups or interrupts
 
 // Connect pin #1 of the expander to Analog 5 (i2c clock)
 // Connect pin #2 of the expander to Analog 4 (i2c data)
@@ -10,8 +11,7 @@
 // Connect pin #6 and 18 of the expander to 5V (power and reset disable)
 // Connect pin #9 of the expander to ground (common ground)
 
-// Output #0 is on pin 10 so connect to digital pin 5
-// #1 - 11 - digital 6 etc.
+// MCP channels #0 to #7 (pins 10-17) connected to Arduino digital pins 5 to 12
 
 Adafruit_MCP23008 mcp;
 
