@@ -13,14 +13,20 @@
 
 // MCP channels #0 to #7 (pins 10-17) connected to Arduino digital pins 5 to 12
 
+// If you add an LED to pin 13, it will light up while the tests are passing. 
+// If any test fails, it will turn off until the next time the tests are run.
+
 Adafruit_MCP23008 mcp;
 
 int arduinoLowPin = 5;
 int pinCount = 8;
+int LED_PIN = 13;
+int testStatus = HIGH;
 
 void setup() { 
   Serial.begin(9600); 
   mcp.begin();      // use default address 0
+  pinMode(LED_PIN, OUTPUT);
 }
 
 void checkEqual(int pin, int expected, int actual, char * description) {
@@ -31,6 +37,7 @@ void checkEqual(int pin, int expected, int actual, char * description) {
        Serial.print(pin);
        Serial.print(" was ");       
        Serial.println(actual ? "HIGH" : "LOW");
+       testStatus = LOW;
      }
 }
 
@@ -80,6 +87,7 @@ void loop() {
     writeArduino(i, HIGH);
     checkEqual(i, HIGH, mcp.digitalRead(i), "ard -> mcp");
   }
-  delay(1000);
+  digitalWrite(LED_PIN, testStatus);
+  delay(500);
 }
 

@@ -28,8 +28,7 @@
 #define WireRead() Wire.receive()
 #endif
 
-////////////////////////////////////////////////////////////////////////////////
-// RTC_DS1307 implementation
+#define CHECK_8BITS(portNumber) if (portNumber > 7) return
 
 void Adafruit_MCP23008::begin(uint8_t addr) {
   if (addr > 7) {
@@ -73,9 +72,7 @@ static uint8_t setIfHigh(uint8_t original, uint8_t position, uint8_t writeValue)
 }
 
 void Adafruit_MCP23008::pinMode(uint8_t portNumber, uint8_t direction) {
-  // only 8 bits!
-  if (portNumber > 7)
-    return;
+  CHECK_8BITS(portNumber);
   
   write8(MCP23008_IODIR, setIfInput(read8(MCP23008_IODIR), portNumber, direction));
 }
@@ -91,27 +88,22 @@ void Adafruit_MCP23008::writeGPIO(uint8_t gpio) {
 
 
 void Adafruit_MCP23008::digitalWrite(uint8_t portNumber, uint8_t writeValue) {
-  if (portNumber > 7)
-    return;
+  CHECK_8BITS(portNumber);
 
   writeGPIO(setIfHigh(readGPIO(), portNumber, writeValue));
 }
 
 void Adafruit_MCP23008::pullUp(uint8_t portNumber, uint8_t writeValue) {
-  // only 8 bits!
-  if (portNumber > 7)
-    return;
+  CHECK_8BITS(portNumber);
 
   write8(MCP23008_GPPU, setIfHigh(read8(MCP23008_GPPU), portNumber, writeValue));
 }
 
-uint8_t Adafruit_MCP23008::digitalRead(uint8_t p) {
-  // only 8 bits!
-  if (p > 7)
+uint8_t Adafruit_MCP23008::digitalRead(uint8_t portNumber) {
+  if (portNumber > 7)
     return 0;
 
-  // read the current GPIO
-  return (readGPIO() >> p) & 0x1;
+  return (readGPIO() >> portNumber) & 0x1;
 }
 
 uint8_t Adafruit_MCP23008::read8(uint8_t addr) {
@@ -119,8 +111,6 @@ uint8_t Adafruit_MCP23008::read8(uint8_t addr) {
   WireWrite(addr);	
   Wire.endTransmission();
   Wire.requestFrom(MCP23008_ADDRESS | i2caddr, 1);
-
-
   return WireRead();
 }
 
