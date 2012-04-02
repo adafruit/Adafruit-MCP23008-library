@@ -59,25 +59,21 @@ void Adafruit_MCP23008::begin(void) {
   begin(0);
 }
 
-void Adafruit_MCP23008::pinMode(uint8_t p, uint8_t d) {
-  uint8_t iodir;
-  
+static uint8_t withValueAtPositionToggled(uint8_t original, uint8_t position, uint8_t shouldSet) {
+  const uint8_t bitMask = 1 << position;
+  return shouldSet ? original |= bitMask : original &= ~bitMask;
+}
 
+static uint8_t setIfInput(uint8_t original, uint8_t position, uint8_t direction) {
+  return withValueAtPositionToggled(original, position, direction == INPUT);
+}
+
+void Adafruit_MCP23008::pinMode(uint8_t portNumber, uint8_t direction) {
   // only 8 bits!
-  if (p > 7)
+  if (portNumber > 7)
     return;
   
-  iodir = read8(MCP23008_IODIR);
-
-  // set the pin and direction
-  if (d == INPUT) {
-    iodir |= 1 << p; 
-  } else {
-    iodir &= ~(1 << p);
-  }
-
-  // write the new IODIR
-  write8(MCP23008_IODIR, iodir);
+  write8(MCP23008_IODIR, setIfInput(read8(MCP23008_IODIR), portNumber, direction));
 }
 
 // read the current GPIO value
