@@ -31,15 +31,19 @@
 #define CHECK_8BITS(portNumber) if (portNumber > 7) return
 
 void Adafruit_MCP23008::begin(uint8_t addr) {
-  if (addr > 7) {
-    addr = 7;
-  }
-  i2caddr = addr;
+  i2caddr = MCP23008_ADDRESS | (addr > 7 ? 7 : addr);
 
   Wire.begin();
 
-  // set defaults!
-  Wire.beginTransmission(MCP23008_ADDRESS | i2caddr);
+  reset();
+}
+
+void Adafruit_MCP23008::begin(void) {
+  begin(0);
+}
+
+void Adafruit_MCP23008::reset() {
+  Wire.beginTransmission(i2caddr);
   WireWrite(MCP23008_IODIR);
   WireWrite(0xFF);
   WireWrite(0x00);
@@ -52,10 +56,6 @@ void Adafruit_MCP23008::begin(uint8_t addr) {
   WireWrite(0x00);
   WireWrite(0x00);	
   Wire.endTransmission();
-}
-
-void Adafruit_MCP23008::begin(void) {
-  begin(0);
 }
 
 static uint8_t withValueAtPositionToggled(uint8_t original, uint8_t position, uint8_t shouldSet) {
@@ -113,16 +113,16 @@ uint8_t Adafruit_MCP23008::digitalRead(uint8_t portNumber) {
 }
 
 uint8_t Adafruit_MCP23008::read8(uint8_t addr) {
-  Wire.beginTransmission(MCP23008_ADDRESS | i2caddr);
+  Wire.beginTransmission(i2caddr);
   WireWrite(addr);	
   Wire.endTransmission();
-  Wire.requestFrom(MCP23008_ADDRESS | i2caddr, 1);
+  Wire.requestFrom(i2caddr, (uint8_t)1);
   return WireRead();
 }
 
 
 void Adafruit_MCP23008::write8(uint8_t addr, uint8_t data) {
-  Wire.beginTransmission(MCP23008_ADDRESS | i2caddr);
+  Wire.beginTransmission(i2caddr);
   WireWrite(addr);
   WireWrite(data);
   Wire.endTransmission();

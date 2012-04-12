@@ -18,6 +18,7 @@ class Adafruit_MCP23008 {
 public:
   void begin(uint8_t addr);
   void begin(void);
+  void reset();
 
   void pinMode(uint8_t p, uint8_t d);
   void digitalWrite(uint8_t p, uint8_t d);
