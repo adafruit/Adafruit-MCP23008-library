@@ -98,6 +98,12 @@ void Adafruit_MCP23008::pullUp(uint8_t portNumber, uint8_t writeValue) {
 
   write8(MCP23008_GPPU, setIfHigh(read8(MCP23008_GPPU), portNumber, writeValue));
 }
+void Adafruit_MCP23008::inputPolarity(uint8_t portNumber, bool inverted) {
+  CHECK_8BITS(portNumber);
+
+  write8(MCP23008_IPOL, 
+         withValueAtPositionToggled(read8(MCP23008_IPOL), portNumber, inverted));
+}
 
 uint8_t Adafruit_MCP23008::digitalRead(uint8_t portNumber) {
   if (portNumber > 7)
