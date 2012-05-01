@@ -1,5 +1,5 @@
 #include <Wire.h>
-#include "Adafruit_MCP23008.h"
+#include <AdafruitMCP23008.h>
 
 // Test i/o expansion. 
 // Checks all 8 pins of MCP23008 as outputs then as inputs
@@ -13,20 +13,22 @@
 
 // MCP channels #0 to #7 (pins 10-17) connected to Arduino digital pins 5 to 12
 
-// If you add an LED to pin 13, it will light up while the tests are passing. 
-// If any test fails, it will turn off until the next time the tests are run.
+// If you add an LED to pin PASS_PIN, it will light up while the tests are passing. 
+// If any test fails, it will turn off until the next time the tests are run and FAIL_PIN will turn on
 
-Adafruit_MCP23008 mcp;
+AdafruitMCP23008 mcp;
 
 int arduinoLowPin = 5;
 int pinCount = 8;
-int LED_PIN = 13;
+int PASS_PIN = 2;
+int FAIL_PIN = 3;
 int testStatus = HIGH;
 
 void setup() { 
   Serial.begin(9600); 
   mcp.begin();      // use default address 0
-  pinMode(LED_PIN, OUTPUT);
+  pinMode(PASS_PIN, OUTPUT);
+  pinMode(FAIL_PIN, OUTPUT);
 }
 
 void checkEqual(int pin, int expected, int actual, char * description) {
@@ -87,7 +89,8 @@ void loop() {
     writeArduino(i, HIGH);
     checkEqual(i, HIGH, mcp.digitalRead(i), "ard -> mcp");
   }
-  digitalWrite(LED_PIN, testStatus);
+  digitalWrite(PASS_PIN, testStatus);
+  digitalWrite(FAIL_PIN, testStatus == HIGH ? LOW : HIGH);
   delay(500);
 }
 
