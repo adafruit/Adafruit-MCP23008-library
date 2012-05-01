@@ -18,10 +18,10 @@
 
 AdafruitMCP23008 mcp;
 
-int arduinoLowPin = 5;
-int pinCount = 8;
-int PASS_PIN = 2;
-int FAIL_PIN = 3;
+const int arduinoLowPin = 5;
+const int pinCount = 8;
+const int PASS_PIN = 2;
+const int FAIL_PIN = 3;
 
 void setup() { 
   Serial.begin(9600); 
@@ -49,14 +49,18 @@ void setMcpPinsMode(int mode) {
   }
 }
 
+int arduinoPin(int pin) {
+  return arduinoLowPin + pin;
+}
+
 void setArduinoPinsMode(int mode) {
   for (int i = 0; i < pinCount; i++) {
-    pinMode(arduinoLowPin + i, mode);
+    pinMode(arduinoPin(i), mode);
   }
 }
 
-void writeArduino(int pin, int signal) {
-    digitalWrite(arduinoLowPin + pin, signal);
+void writeArduino(int arduinoPin, int signal) {
+    digitalWrite(arduinoPin, signal);
     delay(1);
 }
 
@@ -72,11 +76,12 @@ void loop() {
   setArduinoPinsMode(INPUT);
   
   for (int i = 0; i < pinCount; i++) {
+    const int arduinoPinI = arduinoPin(i);
     writeMcp(i, LOW);
-    testsPassing = testsPassing && checkEqual(i, LOW, digitalRead(arduinoLowPin + i), "mcp -> ard");
+    testsPassing = testsPassing && checkEqual(i, LOW, digitalRead(arduinoPinI), "mcp -> ard");
     
     writeMcp(i, HIGH);
-    testsPassing = testsPassing && checkEqual(i, HIGH, digitalRead(arduinoLowPin + i), "mcp -> ard");
+    testsPassing = testsPassing && checkEqual(i, HIGH, digitalRead(arduinoPinI), "mcp -> ard");
   }
   
   Serial.println("Arduino to MCP"); 
@@ -84,12 +89,14 @@ void loop() {
   setArduinoPinsMode(OUTPUT);
   
   for (int i = 0; i < pinCount; i++) {
-    writeArduino(i, LOW);
+    const int arduinoPinI = arduinoPin(i);
+    writeArduino(arduinoPinI, LOW);
     testsPassing = testsPassing && checkEqual(i, LOW, mcp.digitalRead(i), "ard -> mcp");
 
-    writeArduino(i, HIGH);
+    writeArduino(arduinoPinI, HIGH);
     testsPassing = testsPassing && checkEqual(i, HIGH, mcp.digitalRead(i), "ard -> mcp");
   }
+  
   digitalWrite(PASS_PIN, testsPassing ? HIGH  : LOW);
   digitalWrite(FAIL_PIN, testsPassing ? LOW : HIGH);
   delay(500);
