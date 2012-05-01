@@ -22,7 +22,6 @@ int arduinoLowPin = 5;
 int pinCount = 8;
 int PASS_PIN = 2;
 int FAIL_PIN = 3;
-int testStatus = HIGH;
 
 void setup() { 
   Serial.begin(9600); 
@@ -31,7 +30,7 @@ void setup() {
   pinMode(FAIL_PIN, OUTPUT);
 }
 
-void checkEqual(int pin, int expected, int actual, char * description) {
+boolean checkEqual(int pin, int expected, int actual, char * description) {
      if (expected != actual) {
        Serial.print("> FAIL> ");
        Serial.print(description);
@@ -39,8 +38,9 @@ void checkEqual(int pin, int expected, int actual, char * description) {
        Serial.print(pin);
        Serial.print(" was ");       
        Serial.println(actual ? "HIGH" : "LOW");
-       testStatus = LOW;
+       return false;
      }
+     return true;
 }
 
 void setMcpPinsMode(int mode) {
@@ -66,16 +66,17 @@ void writeMcp(int pin, int signal) {
 }
 
 void loop() {
+  boolean testsPassing = true;
   Serial.println("MCP to Arduino"); 
   setMcpPinsMode(OUTPUT);
   setArduinoPinsMode(INPUT);
   
   for (int i = 0; i < pinCount; i++) {
     writeMcp(i, LOW);
-    checkEqual(i, LOW, digitalRead(arduinoLowPin + i), "mcp -> ard");
+    testsPassing = testsPassing && checkEqual(i, LOW, digitalRead(arduinoLowPin + i), "mcp -> ard");
     
     writeMcp(i, HIGH);
-    checkEqual(i, HIGH, digitalRead(arduinoLowPin + i), "mcp -> ard");
+    testsPassing = testsPassing && checkEqual(i, HIGH, digitalRead(arduinoLowPin + i), "mcp -> ard");
   }
   
   Serial.println("Arduino to MCP"); 
@@ -84,13 +85,13 @@ void loop() {
   
   for (int i = 0; i < pinCount; i++) {
     writeArduino(i, LOW);
-    checkEqual(i, LOW, mcp.digitalRead(i), "ard -> mcp");
+    testsPassing = testsPassing && checkEqual(i, LOW, mcp.digitalRead(i), "ard -> mcp");
 
     writeArduino(i, HIGH);
-    checkEqual(i, HIGH, mcp.digitalRead(i), "ard -> mcp");
+    testsPassing = testsPassing && checkEqual(i, HIGH, mcp.digitalRead(i), "ard -> mcp");
   }
-  digitalWrite(PASS_PIN, testStatus);
-  digitalWrite(FAIL_PIN, testStatus == HIGH ? LOW : HIGH);
+  digitalWrite(PASS_PIN, testsPassing ? HIGH  : LOW);
+  digitalWrite(FAIL_PIN, testsPassing ? LOW : HIGH);
   delay(500);
 }
 
