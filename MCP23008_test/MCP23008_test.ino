@@ -13,24 +13,27 @@
 
 // MCP channels #0 to #7 (pins 10-17) connected to Arduino digital pins 5 to 12
 
-// If you add an LED to pin PASS_PIN, it will light up while the tests are passing. 
-// If any test fails, it will turn off until the next time the tests are run and FAIL_PIN will turn on
+// If you add an LED to pin PassPin, it will light up while the tests are passing. 
+// If any test fails, it will turn off until the next time the tests are run and FailPin will turn on
 
 AdafruitMCP23008 mcp;
 
-const int arduinoLowPin = 5;
-const int pinCount = 8;
-const int PASS_PIN = 2;
-const int FAIL_PIN = 3;
+const int PassPin = 13;
+const int FailPin = 2;
+
+const int ArduinoLowPin = 5;
+const int PinCount = 8;
+const int InterruptPin = 3;
 
 void setup() { 
   Serial.begin(9600); 
   mcp.begin();      // use default address 0
-  pinMode(PASS_PIN, OUTPUT);
-  pinMode(FAIL_PIN, OUTPUT);
+  pinMode(InterruptPin, INPUT);
+  pinMode(PassPin, OUTPUT);
+  pinMode(FailPin, OUTPUT);
 }
 
-boolean checkEqual(int pin, int expected, int actual, char * description) {
+boolean checkEqual(int pin, byte expected, byte actual, char * description) {
      if (expected != actual) {
        Serial.print("> FAIL> ");
        Serial.print(description);
@@ -43,62 +46,88 @@ boolean checkEqual(int pin, int expected, int actual, char * description) {
      return true;
 }
 
-void setMcpPinsMode(int mode) {
-  for (int i = 0; i < pinCount; i++) {
+void setMcpPinsMode(byte mode) {
+  for (int i = 0; i < PinCount; i++) {
     mcp.pinMode(i, mode);
   }
 }
 
-int arduinoPin(int pin) {
-  return arduinoLowPin + pin;
+int toArduinoPin(int pin) {
+  return ArduinoLowPin + pin;
 }
 
 void setArduinoPinsMode(int mode) {
-  for (int i = 0; i < pinCount; i++) {
-    pinMode(arduinoPin(i), mode);
+  for (int i = 0; i < PinCount; i++) {
+    pinMode(toArduinoPin(i), mode);
   }
 }
 
-void writeArduino(int arduinoPin, int signal) {
+void writeArduino(int arduinoPin, byte signal) {
     digitalWrite(arduinoPin, signal);
     delay(1);
 }
 
-void writeMcp(int pin, int signal) {
+void writeMcp(int pin, byte signal) {
     mcp.digitalWrite(pin, signal);
     delay(1);
 }
 
+
+boolean checkEachMcpToArduino(unsigned int pin, unsigned int arduinoPin) {
+    writeMcp(pin, LOW);
+    const boolean testsPassing = checkEqual(pin, LOW, digitalRead(arduinoPin), "mcp -> ard");
+    
+    writeMcp(pin, HIGH);
+    return testsPassing && checkEqual(pin, HIGH, digitalRead(arduinoPin), "mcp -> ard");
+}
+
+boolean checkEachArduinoToMcp(unsigned int pin, unsigned int arduinoPin) {
+    writeArduino(arduinoPin, LOW);
+    const int testsPassing = checkEqual(pin, LOW, mcp.digitalRead(pin), "ard -> mcp");
+
+    writeArduino(arduinoPin, HIGH);
+    return testsPassing && checkEqual(pin, HIGH, mcp.digitalRead(pin), "ard -> mcp");
+}
+
+boolean forAllPins(boolean (*checker)(unsigned int, unsigned int)) {
+  boolean testsPassing = true;
+  for (int i = 0; i < PinCount; i++) {    
+    testsPassing = testsPassing && checker(i, toArduinoPin(i));
+  }
+  return testsPassing;
+}
+
 void loop() {
   boolean testsPassing = true;
+  
   Serial.println("MCP to Arduino"); 
   setMcpPinsMode(OUTPUT);
-  setArduinoPinsMode(INPUT);
-  
-  for (int i = 0; i < pinCount; i++) {
-    const int arduinoPinI = arduinoPin(i);
-    writeMcp(i, LOW);
-    testsPassing = testsPassing && checkEqual(i, LOW, digitalRead(arduinoPinI), "mcp -> ard");
-    
-    writeMcp(i, HIGH);
-    testsPassing = testsPassing && checkEqual(i, HIGH, digitalRead(arduinoPinI), "mcp -> ard");
-  }
+  setArduinoPinsMode(INPUT);  
+  testsPassing = testsPassing && forAllPins(checkEachMcpToArduino);
   
   Serial.println("Arduino to MCP"); 
   setMcpPinsMode(INPUT);
   setArduinoPinsMode(OUTPUT);
+  testsPassing = testsPassing && forAllPins(checkEachArduinoToMcp);
   
-  for (int i = 0; i < pinCount; i++) {
-    const int arduinoPinI = arduinoPin(i);
-    writeArduino(arduinoPinI, LOW);
-    testsPassing = testsPassing && checkEqual(i, LOW, mcp.digitalRead(i), "ard -> mcp");
+  /*
+    configure interrupt pin ???
+    set pin low
+    set interrupt on change for pin
+    check interrupt pin is low
+    check INTCAP bit is low
+    set pin high
+    check interrupt pin is high
+    check INTCAP bit is high (resets)
+    check interrupt pin is low
+  */
+  writeArduino(ArduinoLowPin, HIGH);
+  
 
-    writeArduino(arduinoPinI, HIGH);
-    testsPassing = testsPassing && checkEqual(i, HIGH, mcp.digitalRead(i), "ard -> mcp");
-  }
+
   
-  digitalWrite(PASS_PIN, testsPassing ? HIGH  : LOW);
-  digitalWrite(FAIL_PIN, testsPassing ? LOW : HIGH);
+  digitalWrite(PassPin, testsPassing ? HIGH  : LOW);
+  digitalWrite(FailPin, testsPassing ? LOW : HIGH);
   delay(500);
 }
 

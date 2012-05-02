@@ -22,13 +22,16 @@ public:
   void reset();
 
   void pinMode(uint8_t p, uint8_t d);
-  void digitalWrite(uint8_t p, uint8_t d);
+  void digitalWrite(uint8_t p, uint8_t writeValue);
   void pullUp(uint8_t p, uint8_t d);
   void inputPolarity(uint8_t portNumber, bool inverted);
 
   uint8_t digitalRead(uint8_t p);
   uint8_t readGPIO(void);
   void writeGPIO(uint8_t);
+
+  void interruptsWhenValueSwitches(uint8_t portNumber, bool enabled);
+  
 
  private:
   uint8_t i2caddr;

@@ -58,16 +58,15 @@ void AdafruitMCP23008::reset() {
   Wire.endTransmission();
 }
 
-static uint8_t withValueAtPositionToggled(uint8_t original, uint8_t position, uint8_t shouldSet) {
-  const uint8_t bitMask = 1 << position;
-  return shouldSet ? original |= bitMask : original &= ~bitMask;
+static uint8_t withValueAtPositionToggled(uint8_t original, uint8_t position, boolean shouldSet) {
+  return bitWrite(original, position, shouldSet);
 }
 
 static uint8_t setIfInput(uint8_t original, uint8_t position, uint8_t direction) {
   return withValueAtPositionToggled(original, position, direction == INPUT);
 }
 
-static uint8_t setIfHigh(uint8_t original, uint8_t position, uint8_t writeValue) {
+static uint8_t setIfHigh(uint8_t original, uint8_t position, boolean writeValue) {
   return withValueAtPositionToggled(original, position, writeValue == HIGH);
 }
 
@@ -86,6 +85,14 @@ void AdafruitMCP23008::writeGPIO(uint8_t gpio) {
   write8(MCP23008_GPIO, gpio);
 }
 
+void AdafruitMCP23008::interruptsWhenValueSwitches(uint8_t portNumber, bool enabled) {
+  CHECK_8BITS(portNumber);
+
+  write8(MCP23008_INTCON, 
+         withValueAtPositionToggled(read8(MCP23008_INTCON), portNumber, false));
+  write8(MCP23008_GPINTEN, 
+         withValueAtPositionToggled(read8(MCP23008_GPINTEN), portNumber, enabled));
+}
 
 void AdafruitMCP23008::digitalWrite(uint8_t portNumber, uint8_t writeValue) {
   CHECK_8BITS(portNumber);
