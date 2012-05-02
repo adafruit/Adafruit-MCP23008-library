@@ -58,22 +58,18 @@ void AdafruitMCP23008::reset() {
   Wire.endTransmission();
 }
 
-static uint8_t withValueAtPositionToggled(uint8_t original, uint8_t position, boolean shouldSet) {
-  return bitWrite(original, position, shouldSet);
-}
-
-static uint8_t setIfInput(uint8_t original, uint8_t position, uint8_t direction) {
-  return withValueAtPositionToggled(original, position, direction == INPUT);
+static uint8_t withValueAtPositionToggled(const uint8_t original, const uint8_t position, const boolean shouldSet) {
+  return shouldSet ? original | bit(position) : original & ~bit(position);
 }
 
 static uint8_t setIfHigh(uint8_t original, uint8_t position, boolean writeValue) {
   return withValueAtPositionToggled(original, position, writeValue == HIGH);
 }
 
-void AdafruitMCP23008::pinMode(uint8_t portNumber, uint8_t direction) {
+void AdafruitMCP23008::pinMode(const uint8_t portNumber, const uint8_t direction) {
   CHECK_8BITS(portNumber);
   
-  write8(MCP23008_IODIR, setIfInput(read8(MCP23008_IODIR), portNumber, direction));
+  updateRegister(MCP23008_IODIR, portNumber, direction == INPUT); 
 }
 
 // read the current GPIO value
@@ -85,41 +81,54 @@ void AdafruitMCP23008::writeGPIO(uint8_t gpio) {
   write8(MCP23008_GPIO, gpio);
 }
 
-void AdafruitMCP23008::interruptsWhenValueSwitches(uint8_t portNumber, bool enabled) {
+void AdafruitMCP23008::interruptWhenValueSwitchesAt(const uint8_t portNumber, const bool enabled) {
   CHECK_8BITS(portNumber);
 
-  write8(MCP23008_INTCON, 
-         withValueAtPositionToggled(read8(MCP23008_INTCON), portNumber, false));
-  write8(MCP23008_GPINTEN, 
-         withValueAtPositionToggled(read8(MCP23008_GPINTEN), portNumber, enabled));
+  updateRegister(MCP23008_INTCON, portNumber, false);
+  updateRegister(MCP23008_GPINTEN, portNumber, enabled);
 }
 
-void AdafruitMCP23008::digitalWrite(uint8_t portNumber, uint8_t writeValue) {
+int8_t AdafruitMCP23008::interruptValueAt(const uint8_t portNumber) {
+  if (portNumber > 7)
+    return -1;
+  
+  if (bitRead(read8(MCP23008_INTF), portNumber)) {
+    return -1;
+  }
+  return bitRead(read8(MCP23008_INTCAP), portNumber) ? 1 : 0;
+}
+
+void AdafruitMCP23008::digitalWrite(const uint8_t portNumber, const boolean writeValue) {
   CHECK_8BITS(portNumber);
 
-  writeGPIO(setIfHigh(readGPIO(), portNumber, writeValue));
+  updateRegister(MCP23008_GPIO, portNumber, writeValue);
 }
 
 void AdafruitMCP23008::pullUp(uint8_t portNumber, uint8_t writeValue) {
   CHECK_8BITS(portNumber);
-
-  write8(MCP23008_GPPU, setIfHigh(read8(MCP23008_GPPU), portNumber, writeValue));
+  updateRegister(MCP23008_GPPU, portNumber, writeValue == HIGH);
 }
+
 void AdafruitMCP23008::inputPolarity(uint8_t portNumber, bool inverted) {
   CHECK_8BITS(portNumber);
 
-  write8(MCP23008_IPOL, 
-         withValueAtPositionToggled(read8(MCP23008_IPOL), portNumber, inverted));
+  updateRegister(MCP23008_IPOL, portNumber, inverted);
 }
 
 uint8_t AdafruitMCP23008::digitalRead(uint8_t portNumber) {
   if (portNumber > 7)
     return 0;
 
-  return (readGPIO() >> portNumber) & 0x1;
+  return bitRead(readGPIO(), portNumber);
 }
 
-uint8_t AdafruitMCP23008::read8(uint8_t addr) {
+void AdafruitMCP23008::updateRegister(const uint8_t registerId, const uint8_t offset, const bool bitValue) {
+  uint8_t bits = read8(registerId);
+  bitWrite(bits, offset, bitValue);
+  write8(registerId, bits);
+}
+
+uint8_t AdafruitMCP23008::read8(const uint8_t addr) {
   Wire.beginTransmission(i2caddr);
   WireWrite(addr);	
   Wire.endTransmission();
@@ -128,7 +137,7 @@ uint8_t AdafruitMCP23008::read8(uint8_t addr) {
 }
 
 
-void AdafruitMCP23008::write8(uint8_t addr, uint8_t data) {
+void AdafruitMCP23008::write8(const uint8_t addr, const uint8_t data) {
   Wire.beginTransmission(i2caddr);
   WireWrite(addr);
   WireWrite(data);

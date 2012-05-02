@@ -22,7 +22,7 @@ public:
   void reset();
 
   void pinMode(uint8_t p, uint8_t d);
-  void digitalWrite(uint8_t p, uint8_t writeValue);
+  void digitalWrite(const uint8_t portNumber, const uint8_t writeValue);
   void pullUp(uint8_t p, uint8_t d);
   void inputPolarity(uint8_t portNumber, bool inverted);
 
@@ -30,13 +30,17 @@ public:
   uint8_t readGPIO(void);
   void writeGPIO(uint8_t);
 
-  void interruptsWhenValueSwitches(uint8_t portNumber, bool enabled);
-  
 
+  void interruptWhenValueSwitchesAt(uint8_t portNumber, bool enabled);
+
+  // -1 for not interrupted, 0 for interrupted with low value, 1 for interrupted with high value
+  int8_t interruptValueAt(uint8_t portNumber);
+  
+  uint8_t read8(const uint8_t addr);
  private:
   uint8_t i2caddr;
-  uint8_t read8(uint8_t addr);
-  void write8(uint8_t addr, uint8_t data);
+  void write8(const uint8_t addr, const uint8_t data);
+  void updateRegister(const uint8_t registerId, const uint8_t offset, const bool bitValue);
 };
 
 #define MCP23008_ADDRESS 0x20
