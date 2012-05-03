@@ -31,6 +31,7 @@
 #define CHECK_8BITS(portNumber) if (portNumber > 7) return
 static const uint8_t IOCON_INTPOL = 1;
 static const uint8_t IOCON_ODR = 2;
+static const uint8_t ZEROS = 0x00;
 
 void AdafruitMCP23008::begin(uint8_t addr) {
   i2caddr = MCP23008_ADDRESS | (addr > 7 ? 7 : addr);
@@ -48,15 +49,15 @@ void AdafruitMCP23008::reset() {
   Wire.beginTransmission(i2caddr);
   WireWrite(MCP23008_IODIR);
   WireWrite(0xFF);
-  WireWrite(0x00);
-  WireWrite(0x00);
-  WireWrite(0x00);
-  WireWrite(0x00);
-  WireWrite(0x00);
-  WireWrite(0x00);
-  WireWrite(0x00);
-  WireWrite(0x00);
-  WireWrite(0x00);	
+  WireWrite(ZEROS);
+  WireWrite(ZEROS);
+  WireWrite(ZEROS);
+  WireWrite(ZEROS);
+  WireWrite(ZEROS);
+  WireWrite(ZEROS);
+  WireWrite(ZEROS);
+  WireWrite(ZEROS);
+  WireWrite(ZEROS);	
   Wire.endTransmission();
 }
 
@@ -83,18 +84,15 @@ void AdafruitMCP23008::writeGPIO(uint8_t gpio) {
 }
 
 void AdafruitMCP23008::clearInterrupts(void) {
-  write8(MCP23008_INTCON, 0x00);
-  write8(MCP23008_DEFVAL, 0x00);
-  write8(MCP23008_GPINTEN, 0x00);
+  write8(MCP23008_INTCON, ZEROS);
+  write8(MCP23008_DEFVAL, ZEROS);
+  write8(MCP23008_GPINTEN, ZEROS);
+  readINTCAP();
 }
 
-void AdafruitMCP23008::setInterruptPolarity(const uint8_t polarity) {
+void AdafruitMCP23008::useActiveInterrupts(const uint8_t polarity) {
   setRegisterBit(MCP23008_IOCON, IOCON_ODR, false);
-  if (polarity == HIGH) {
-    setRegisterBit(MCP23008_IOCON, IOCON_INTPOL, true);
-  } else {
-    setRegisterBit(MCP23008_IOCON, IOCON_INTPOL, false);
-  }
+  setRegisterBit(MCP23008_IOCON, IOCON_INTPOL, polarity == HIGH);
 }
 
 void AdafruitMCP23008::interruptWhenValueSwitchesAt(const uint8_t portNumber, const bool enabled) {

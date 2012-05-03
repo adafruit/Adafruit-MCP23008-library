@@ -29,13 +29,15 @@ public:
   uint8_t digitalRead(const uint8_t portNumber);
   
 
-  uint8_t readGPIO(void);
-  void writeGPIO(uint8_t);
 
   void clearInterrupts(void);
-  void setInterruptPolarity(const uint8_t polarity); // HIGH or LOWif (
+  void useActiveInterrupts(const uint8_t polarity); // HIGH or LOW
   void interruptWhenValueSwitchesAt(const uint8_t portNumber, const bool enabled);
   uint8_t wasInterruptedAt(const uint8_t portNumber);
+
+
+  uint8_t readGPIO(void);
+  void writeGPIO(uint8_t);
   uint8_t readINTCAP(void);
   uint8_t readIOCON(void);
 

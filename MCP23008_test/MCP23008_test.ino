@@ -140,17 +140,14 @@ void loop() {
   Serial.println("Interrupts"); 
   setMcpPinsMode(INPUT);
   pinMode(InterruptPin, INPUT);
-/*  
-  mcp.setInterruptPolarity(LOW);  
-  Serial.print("low"); Serial.println(mcp.readIOCON(), BIN);
+
+  mcp.useActiveInterrupts(LOW);  
   passed = passed && forAllPins(checkEachMcpSwitchedInterrupt, LOW);
-*/
-  mcp.setInterruptPolarity(HIGH);  
-  Serial.print("high"); Serial.println(mcp.readIOCON(), BIN);
+
+  mcp.useActiveInterrupts(HIGH);  
   passed = passed && forAllPins(checkEachMcpSwitchedInterrupt, HIGH);
 
-  digitalWrite(PassPin, passed ? HIGH  : LOW);
-  digitalWrite(FailPin, passed ? LOW : HIGH);
+  digitalWrite(passed ? PassPin : FailPin, HIGH);
   delay(500);
 }
 
