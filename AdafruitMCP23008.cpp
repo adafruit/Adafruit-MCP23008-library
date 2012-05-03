@@ -80,8 +80,9 @@ void AdafruitMCP23008::writeGPIO(uint8_t gpio) {
   write8(MCP23008_GPIO, gpio);
 }
 
-uint8_t AdafruitMCP23008::readINTCAP(void) {
-  return read8(MCP23008_INTCAP);
+void AdafruitMCP23008::clearInterrupts(void) {
+  write8(MCP23008_INTCON, 0x00);
+  write8(MCP23008_GPINTEN, 0x00);
 }
 
 void AdafruitMCP23008::interruptWhenValueSwitchesAt(const uint8_t portNumber, const bool enabled) {
@@ -97,6 +98,10 @@ uint8_t AdafruitMCP23008::wasInterruptedAt(const uint8_t portNumber) {
     return 0;
 
   return bitRead(read8(MCP23008_INTF), portNumber) ? true : false;
+}
+
+uint8_t AdafruitMCP23008::readINTCAP(void) {
+  return read8(MCP23008_INTCAP);
 }
 
 void AdafruitMCP23008::digitalWrite(const uint8_t portNumber, const boolean writeValue) {

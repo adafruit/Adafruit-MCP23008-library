@@ -31,10 +31,11 @@ public:
 
   uint8_t readGPIO(void);
   void writeGPIO(uint8_t);
-  uint8_t readINTCAP(void);
 
+  void clearInterrupts(void);
   void interruptWhenValueSwitchesAt(const uint8_t portNumber, const bool enabled);
   uint8_t wasInterruptedAt(const uint8_t portNumber);
+  uint8_t readINTCAP(void);
 
  private:
   uint8_t i2caddr;
