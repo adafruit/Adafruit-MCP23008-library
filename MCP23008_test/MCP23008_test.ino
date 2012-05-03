@@ -41,7 +41,7 @@ boolean checkEqual(unsigned int pin, int expected, int actual, char * descriptio
        Serial.print(" was ");
        switch(actual) {
          case 1: Serial.print("HIGH"); break;
-         case 2: Serial.print("LOW"); break;
+         case 0: Serial.print("LOW"); break;
          default: Serial.print(actual); break;
        }
        Serial.println();
@@ -80,25 +80,24 @@ boolean checkInterruptValueAt(unsigned int pin, int expectedValue) {
   return checkEqual(pin, expectedValue, bitRead(mcp.readINTCAP(), pin), "interrupt value");
 }
 
-boolean checkInterruptionAt(unsigned int pin, boolean wasInterrupted, int interruptSignal) {
-    return checkEqual(pin, wasInterrupted, mcp.wasInterruptedAt(pin), "interrupted")
-           && checkEqual(InterruptPin, interruptSignal, digitalRead(InterruptPin), "interrupt set");
+boolean checkInterruptionAt(unsigned int pin, boolean wasInterrupted, int interruptSignal, char* message) {
+    return checkEqual(pin, wasInterrupted, mcp.wasInterruptedAt(pin), message)
+        && checkEqual(InterruptPin, interruptSignal, digitalRead(InterruptPin), message);
 }
 
 boolean checkEachMcpSwitchedInterrupt(unsigned int pin, unsigned int arduinoPin, int interruptPolarity) {
   const int notInterrupted = interruptPolarity == HIGH ? LOW : HIGH;
-  mcp.clearInterrupts();
-  
   
   writeArduino(arduinoPin, LOW);
-  
+  mcp.clearInterrupts();
+    
   mcp.interruptWhenValueSwitchesAt(pin, true);
-  boolean passed = checkInterruptionAt(pin, false, notInterrupted);  
+  boolean passed = checkInterruptionAt(pin, false, notInterrupted, "before interrupt");  
   
   writeArduino(arduinoPin, HIGH);
-  return checkInterruptionAt(pin, true, interruptPolarity)
-                  && checkInterruptValueAt(pin, HIGH)
-                  && checkInterruptionAt(pin, false, notInterrupted);
+  return passed && checkInterruptionAt(pin, true, interruptPolarity, "interrupted")
+                && checkInterruptValueAt(pin, HIGH)
+                && checkInterruptionAt(pin, false, notInterrupted, "after clear");
 }
 
 boolean checkEachMcpToArduino(unsigned int pin, unsigned int arduinoPin, int value) {
@@ -141,9 +140,15 @@ void loop() {
   Serial.println("Interrupts"); 
   setMcpPinsMode(INPUT);
   pinMode(InterruptPin, INPUT);
-  passed = passed //&& forAllPins(checkEachMcpSwitchedInterrupt, HIGH)
-                  && forAllPins(checkEachMcpSwitchedInterrupt, LOW);
-    
+/*  
+  mcp.setInterruptPolarity(LOW);  
+  Serial.print("low"); Serial.println(mcp.readIOCON(), BIN);
+  passed = passed && forAllPins(checkEachMcpSwitchedInterrupt, LOW);
+*/
+  mcp.setInterruptPolarity(HIGH);  
+  Serial.print("high"); Serial.println(mcp.readIOCON(), BIN);
+  passed = passed && forAllPins(checkEachMcpSwitchedInterrupt, HIGH);
+
   digitalWrite(PassPin, passed ? HIGH  : LOW);
   digitalWrite(FailPin, passed ? LOW : HIGH);
   delay(500);

@@ -33,15 +33,17 @@ public:
   void writeGPIO(uint8_t);
 
   void clearInterrupts(void);
+  void setInterruptPolarity(const uint8_t polarity); // HIGH or LOWif (
   void interruptWhenValueSwitchesAt(const uint8_t portNumber, const bool enabled);
   uint8_t wasInterruptedAt(const uint8_t portNumber);
   uint8_t readINTCAP(void);
+  uint8_t readIOCON(void);
 
  private:
   uint8_t i2caddr;
   uint8_t read8(const uint8_t addr);
   void write8(const uint8_t addr, const uint8_t data);
-  void updateRegister(const uint8_t registerId, const uint8_t offset, const bool bitValue);
+  void setRegisterBit(const uint8_t registerId, const uint8_t offset, const bool bitValue);
 };
 
 #define MCP23008_ADDRESS 0x20
