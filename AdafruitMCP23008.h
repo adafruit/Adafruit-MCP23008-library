@@ -21,21 +21,21 @@ public:
   void begin(void);
   void reset();
 
-  void pinMode(uint8_t p, uint8_t d);
+  void pinMode(const uint8_t portNumber, const uint8_t direction);
   void digitalWrite(const uint8_t portNumber, const uint8_t writeValue);
-  void pullUp(uint8_t p, uint8_t d);
-  void inputPolarity(uint8_t portNumber, bool inverted);
+  void pullUp(const uint8_t portNumber, const uint8_t d);
+  void inputPolarity(const uint8_t portNumber, const bool inverted);
 
-  uint8_t digitalRead(uint8_t p);
+  uint8_t digitalRead(const uint8_t portNumber);
+  
+
   uint8_t readGPIO(void);
   void writeGPIO(uint8_t);
 
 
-  void interruptWhenValueSwitchesAt(uint8_t portNumber, bool enabled);
+  void interruptWhenValueSwitchesAt(const uint8_t portNumber, const bool enabled);
+  uint8_t wasInterruptedAt(const uint8_t portNumber);
 
-  // -1 for not interrupted, 0 for interrupted with low value, 1 for interrupted with high value
-  int8_t interruptValueAt(uint8_t portNumber);
-  
   uint8_t read8(const uint8_t addr);
  private:
   uint8_t i2caddr;

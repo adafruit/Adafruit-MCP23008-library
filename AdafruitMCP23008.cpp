@@ -88,15 +88,20 @@ void AdafruitMCP23008::interruptWhenValueSwitchesAt(const uint8_t portNumber, co
   updateRegister(MCP23008_GPINTEN, portNumber, enabled);
 }
 
-int8_t AdafruitMCP23008::interruptValueAt(const uint8_t portNumber) {
+
+uint8_t AdafruitMCP23008::wasInterruptedAt(const uint8_t portNumber) {
   if (portNumber > 7)
-    return -1;
-  
-  if (bitRead(read8(MCP23008_INTF), portNumber)) {
-    return -1;
-  }
-  return bitRead(read8(MCP23008_INTCAP), portNumber) ? 1 : 0;
+    return 0;
+
+  return bitRead(read8(MCP23008_INTF), portNumber) ? true : false;
 }
+
+// int8_t AdafruitMCP23008::interruptValueAt(const uint8_t portNumber) {  
+//   if (bitRead(read8(MCP23008_INTF), portNumber)) {
+//     return -1;
+//   }
+//   return bitRead(read8(MCP23008_INTCAP), portNumber) ? 1 : 0;
+// }
 
 void AdafruitMCP23008::digitalWrite(const uint8_t portNumber, const boolean writeValue) {
   CHECK_8BITS(portNumber);

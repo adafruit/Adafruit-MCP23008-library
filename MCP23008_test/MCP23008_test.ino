@@ -97,24 +97,15 @@ boolean forAllPins(boolean (*checker)(unsigned int, unsigned int, int), int valu
 
 void dump(char* pre) {
   Serial.print(pre);
-  Serial.print(" gpinten: ");
-  Serial.print(mcp.read8(2));
+  Serial.print(" gpinten: "); Serial.print(mcp.read8(2));
   /*
-  Serial.print(" defval: ");
-  Serial.print(mcp.read8(3));
-  Serial.print(" intcon: ");
-  Serial.print(mcp.read8(4));
+  Serial.print(" defval: "); Serial.print(mcp.read8(3));
+  Serial.print(" intcon: "); Serial.print(mcp.read8(4));
   */
-  Serial.print(" intf: ");
-  Serial.print(mcp.read8(7));
-  /*
-  Serial.print(" intcap: ");
-  Serial.print(mcp.read8(8));
-  */
-  Serial.print(" gpio: ");
-  Serial.print(mcp.readGPIO());
-  Serial.print(" olat: ");
-  Serial.println(mcp.read8(10));
+  Serial.print(" intf: "); Serial.print(mcp.read8(7));
+//  Serial.print(" intcap: "); Serial.print(mcp.read8(8));
+//  Serial.print(" gpio: "); Serial.print(mcp.readGPIO());
+  Serial.println();
 }
 
 void loop() {
@@ -151,13 +142,17 @@ void loop() {
   dump(">     ");
 
   mcp.interruptWhenValueSwitchesAt(pin, true);
-//  passed = passed && checkEqual(InterruptPin, HIGH, digitalRead(InterruptPin), "interrupt clear");
-  dump("> i   ");
- //  passed = passed && checkEqual(pin, -1, mcp.interruptValueAt(pin), "interrupt value");
+  passed = passed && checkEqual(pin, false, mcp.wasInterruptedAt(pin), "not interrupted")
+                  && checkEqual(InterruptPin, HIGH, digitalRead(InterruptPin), "interrupt clear");
+  
   
   writeArduino(toArduinoPin(pin), HIGH);
-  dump("> ii  ");
-  writeMcp(pin, LOW);
+//  dump("> i   ");
+
+  passed = passed && checkEqual(pin, true, mcp.wasInterruptedAt(pin), "interrupted")
+                  && checkEqual(InterruptPin, LOW, digitalRead(InterruptPin), "interrupt set");
+  
+//  writeArduino(toArduinoPin(pin), LOW);
   dump("> iii ");
   
 //  passed = passed && checkEqual(InterruptPin, LOW, digitalRead(InterruptPin), "interrupted");
