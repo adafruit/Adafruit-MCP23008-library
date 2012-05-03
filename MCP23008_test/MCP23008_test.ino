@@ -76,6 +76,26 @@ void writeMcp(int pin, byte signal) {
     delay(1);
 }
 
+boolean checkInterruptValueAt(unsigned int pin, int expectedValue) {
+  return checkEqual(pin, expectedValue, bitRead(mcp.readINTCAP(), pin), "interrupt value");
+}
+
+boolean checkInterruptionAt(unsigned int pin, boolean wasInterrupted) {
+    return checkEqual(pin, wasInterrupted, mcp.wasInterruptedAt(pin), "interrupted")
+           && checkEqual(InterruptPin, wasInterrupted ? LOW : HIGH, digitalRead(InterruptPin), "interrupt set");
+}
+
+boolean checkEachMcpSwitchedInterrupt(unsigned int pin, unsigned int arduinoPin, int value) {
+  writeArduino(arduinoPin, LOW);
+  
+  mcp.interruptWhenValueSwitchesAt(pin, true);
+  boolean passed = checkInterruptionAt(pin, false);  
+  
+  writeArduino(arduinoPin, HIGH);
+  return checkInterruptionAt(pin, true)
+                  && checkInterruptValueAt(pin, HIGH)
+                  && checkInterruptionAt(pin, false);
+}
 
 boolean checkEachMcpToArduino(unsigned int pin, unsigned int arduinoPin, int value) {
     writeMcp(pin, value);
@@ -95,19 +115,6 @@ boolean forAllPins(boolean (*checker)(unsigned int, unsigned int, int), int valu
   return passed;
 }
 
-void dump(char* pre) {
-  Serial.print(pre);
-  Serial.print(" gpinten: "); Serial.print(mcp.read8(2));
-  /*
-  Serial.print(" defval: "); Serial.print(mcp.read8(3));
-  Serial.print(" intcon: "); Serial.print(mcp.read8(4));
-  */
-  Serial.print(" intf: "); Serial.print(mcp.read8(7));
-//  Serial.print(" intcap: "); Serial.print(mcp.read8(8));
-//  Serial.print(" gpio: "); Serial.print(mcp.readGPIO());
-  Serial.println();
-}
-
 void loop() {
   boolean passed = true;
   
@@ -123,41 +130,13 @@ void loop() {
   setArduinoPinsMode(OUTPUT);
   passed = passed 
            && forAllPins(checkEachArduinoToMcp, HIGH)
-           && forAllPins(checkEachArduinoToMcp, LOW);           
-  
-  /*
-    check interrupt pin is low
-    check INTCAP bit is low
-    set pin high
-    check interrupt pin is high
-    check INTCAP bit is high (resets)
-    check interrupt pin is low
-  */
-  const unsigned int pin = 1;
+           && forAllPins(checkEachArduinoToMcp, LOW);
+           
   Serial.println("Interrupts"); 
   setMcpPinsMode(INPUT);
   pinMode(InterruptPin, INPUT);
-  forAllPins(checkEachArduinoToMcp, LOW);
-  
-  dump(">     ");
-
-  mcp.interruptWhenValueSwitchesAt(pin, true);
-  passed = passed && checkEqual(pin, false, mcp.wasInterruptedAt(pin), "not interrupted")
-                  && checkEqual(InterruptPin, HIGH, digitalRead(InterruptPin), "interrupt clear");
-  
-  
-  writeArduino(toArduinoPin(pin), HIGH);
-//  dump("> i   ");
-
-  passed = passed && checkEqual(pin, true, mcp.wasInterruptedAt(pin), "interrupted")
-                  && checkEqual(InterruptPin, LOW, digitalRead(InterruptPin), "interrupt set");
-  
-//  writeArduino(toArduinoPin(pin), LOW);
-  dump("> iii ");
-  
-//  passed = passed && checkEqual(InterruptPin, LOW, digitalRead(InterruptPin), "interrupted");
-  //passed = passed && checkEqual(pin, HIGH, mcp.interruptValueAt(pin), "interrupt value");
-  
+  passed = passed && forAllPins(checkEachMcpSwitchedInterrupt, 0);
+    
   digitalWrite(PassPin, passed ? HIGH  : LOW);
   digitalWrite(FailPin, passed ? LOW : HIGH);
   delay(500);

@@ -31,14 +31,14 @@ public:
 
   uint8_t readGPIO(void);
   void writeGPIO(uint8_t);
-
+  uint8_t readINTCAP(void);
 
   void interruptWhenValueSwitchesAt(const uint8_t portNumber, const bool enabled);
   uint8_t wasInterruptedAt(const uint8_t portNumber);
 
-  uint8_t read8(const uint8_t addr);
  private:
   uint8_t i2caddr;
+  uint8_t read8(const uint8_t addr);
   void write8(const uint8_t addr, const uint8_t data);
   void updateRegister(const uint8_t registerId, const uint8_t offset, const bool bitValue);
 };
