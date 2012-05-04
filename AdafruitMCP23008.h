@@ -28,11 +28,10 @@ public:
 
   uint8_t digitalRead(const uint8_t portNumber);
   
-
-
   void clearInterrupts(void);
   void useActiveInterrupts(const uint8_t polarity); // HIGH or LOW
-  void interruptWhenValueSwitchesAt(const uint8_t portNumber, const bool enabled);
+  void interruptsOnPinChange(const uint8_t portNumber, const bool enabled);
+  void interruptsOnChangeFromRegister(const uint8_t portNumber, const bool registerValue, const bool enabled);
   uint8_t wasInterruptedAt(const uint8_t portNumber);
 
 
@@ -41,8 +40,11 @@ public:
   uint8_t readINTCAP(void);
   uint8_t readIOCON(void);
 
+  void dumpConfigurationTo(Stream& stream);
+
  private:
   uint8_t i2caddr;
+  void dumpRegister(Stream& stream, const uint8_t registerId, char* name);
   uint8_t read8(const uint8_t addr);
   void write8(const uint8_t addr, const uint8_t data);
   void setRegisterBit(const uint8_t registerId, const uint8_t offset, const bool bitValue);

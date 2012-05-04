@@ -19,6 +19,7 @@
 #include <Wire.h>
 #include <avr/pgmspace.h>
 #include "AdafruitMCP23008.h"
+#include "Stream.h"
 
 #if ARDUINO >= 100
 #define WireWrite(b) Wire.write((byte)b)
@@ -95,11 +96,19 @@ void AdafruitMCP23008::useActiveInterrupts(const uint8_t polarity) {
   setRegisterBit(MCP23008_IOCON, IOCON_INTPOL, polarity == HIGH);
 }
 
-void AdafruitMCP23008::interruptWhenValueSwitchesAt(const uint8_t portNumber, const bool enabled) {
+void AdafruitMCP23008::interruptsOnPinChange(const uint8_t portNumber, const bool enabled) {
   CHECK_8BITS(portNumber);
 
   setRegisterBit(MCP23008_INTCON, portNumber, false);
   setRegisterBit(MCP23008_GPINTEN, portNumber, enabled);
+}
+
+void AdafruitMCP23008::interruptsOnChangeFromRegister(const uint8_t portNumber, const bool registerValue, 
+						      const bool enabled) 
+{
+  setRegisterBit(MCP23008_INTCON, portNumber, true);
+  setRegisterBit(MCP23008_GPINTEN, portNumber, enabled);
+  setRegisterBit(MCP23008_DEFVAL, portNumber, registerValue);
 }
 
 
@@ -140,6 +149,26 @@ uint8_t AdafruitMCP23008::digitalRead(uint8_t portNumber) {
     return 0;
 
   return bitRead(readGPIO(), portNumber);
+}
+
+
+void AdafruitMCP23008::dumpConfigurationTo(Stream& stream) {
+  dumpRegister(stream, MCP23008_IODIR, "IODIR");
+  dumpRegister(stream, MCP23008_IPOL, "IPOL");
+  dumpRegister(stream, MCP23008_GPINTEN, "GPINTEN");
+  dumpRegister(stream, MCP23008_DEFVAL, "DEFVAL");
+  dumpRegister(stream, MCP23008_INTCON, "INTCON");
+  dumpRegister(stream, MCP23008_IOCON, "IOCON");
+  dumpRegister(stream, MCP23008_GPPU, "GPPU");
+  dumpRegister(stream, MCP23008_INTF, "INTF");
+  dumpRegister(stream, MCP23008_OLAT, "OLAT");
+}
+
+void AdafruitMCP23008::dumpRegister(Stream& stream, const uint8_t registerId, char* name) {
+  stream.print(name);
+  stream.print(": ");
+  stream.print(read8(registerId), 2);
+  stream.print(" ");
 }
 
 void AdafruitMCP23008::setRegisterBit(const uint8_t registerId, const uint8_t offset, const bool bitValue) {

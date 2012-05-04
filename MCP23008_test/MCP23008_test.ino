@@ -33,21 +33,29 @@ void setup() {
 }
 
 boolean checkEqual(unsigned int pin, int expected, int actual, char * description) {
-     if (expected != actual) {
-       Serial.print("> FAIL> ");
-       Serial.print(description);
-       Serial.print(" Pin ");
-       Serial.print(pin);
-       Serial.print(" was ");
-       switch(actual) {
-         case 1: Serial.print("HIGH"); break;
-         case 0: Serial.print("LOW"); break;
-         default: Serial.print(actual); break;
-       }
-       Serial.println();
-       return false;
-     }
-     return true;
+  if (expected != actual) {
+    Serial.print("> FAIL> ");
+    Serial.print(description);
+    Serial.print(" Pin ");
+    Serial.print(pin);
+    Serial.print(" was ");
+    switch(actual) {
+    case 1: 
+      Serial.print("HIGH"); 
+      break;
+    case 0: 
+      Serial.print("LOW"); 
+      break;
+    default: 
+      Serial.print(actual); 
+      break;
+    }
+    Serial.print(" [");
+    mcp.dumpConfigurationTo(Serial);
+    Serial.println("]");
+    return false;
+  }
+  return true;
 }
 
 void setMcpPinsMode(byte mode) {
@@ -67,47 +75,67 @@ void setArduinoPinsMode(int mode) {
 }
 
 void writeArduino(int arduinoPin, byte signal) {
-    digitalWrite(arduinoPin, signal);
-    delay(1);
+  digitalWrite(arduinoPin, signal);
+  delay(1);
 }
 
 void writeMcp(int pin, byte signal) {
-    mcp.digitalWrite(pin, signal);
-    delay(1);
+  mcp.digitalWrite(pin, signal);
+  delay(1);
 }
 
-boolean checkInterruptValueAt(unsigned int pin, int expectedValue) {
+boolean readAndCheckInterruptValueAt(unsigned int pin, int expectedValue) {
   return checkEqual(pin, expectedValue, bitRead(mcp.readINTCAP(), pin), "interrupt value");
 }
 
 boolean checkInterruptionAt(unsigned int pin, boolean wasInterrupted, int interruptSignal, char* message) {
-    return checkEqual(pin, wasInterrupted, mcp.wasInterruptedAt(pin), message)
-        && checkEqual(InterruptPin, interruptSignal, digitalRead(InterruptPin), message);
+  return checkEqual(pin, wasInterrupted, mcp.wasInterruptedAt(pin), message)
+    && checkEqual(InterruptPin, interruptSignal, digitalRead(InterruptPin), message);
 }
 
-boolean checkEachMcpSwitchedInterrupt(unsigned int pin, unsigned int arduinoPin, int interruptPolarity) {
-  const int notInterrupted = interruptPolarity == HIGH ? LOW : HIGH;
-  
+boolean checkEachMcpOnPinInterrupt(unsigned int pin, unsigned int arduinoPin, int interruptPolarity) {
+  const int notInterrupted = interruptPolarity == HIGH ? LOW : HIGH;  
   writeArduino(arduinoPin, LOW);
   mcp.clearInterrupts();
-    
-  mcp.interruptWhenValueSwitchesAt(pin, true);
-  boolean passed = checkInterruptionAt(pin, false, notInterrupted, "before interrupt");  
+
+  mcp.interruptsOnPinChange(pin, true);
+  boolean passed = checkInterruptionAt(pin, false, notInterrupted, "on pin before interrupt");  
+
+  writeArduino(arduinoPin, LOW);
+  passed = passed && checkInterruptionAt(pin, false, notInterrupted, "on pin write no change");  
+
+
+  writeArduino(arduinoPin, HIGH);
+  return passed && checkInterruptionAt(pin, true, interruptPolarity, "on pin interrupted")
+                && readAndCheckInterruptValueAt(pin, HIGH)
+                && checkInterruptionAt(pin, false, notInterrupted, "on pin after clear");
+}
+
+boolean checkEachMcpOnRegisterChangeInterrupt(unsigned int pin, unsigned int arduinoPin, int interruptPolarity) {
+  const int notInterrupted = interruptPolarity == HIGH ? LOW : HIGH;  
+  writeArduino(arduinoPin, LOW);
+  mcp.clearInterrupts();
+
+  mcp.interruptsOnChangeFromRegister(pin, LOW, true);
+  boolean passed = checkInterruptionAt(pin, false, notInterrupted, "on register before interrupt");  
+
+  writeArduino(arduinoPin, LOW);
+  passed = passed && checkInterruptionAt(pin, false, notInterrupted, "on register write no change");  
   
   writeArduino(arduinoPin, HIGH);
-  return passed && checkInterruptionAt(pin, true, interruptPolarity, "interrupted")
-                && checkInterruptValueAt(pin, HIGH)
-                && checkInterruptionAt(pin, false, notInterrupted, "after clear");
+  return passed && checkInterruptionAt(pin, true, interruptPolarity, "on register interrupted")
+                && readAndCheckInterruptValueAt(pin, HIGH)
+                && checkInterruptionAt(pin, true, interruptPolarity, "on register still interrupted");
 }
 
 boolean checkEachMcpToArduino(unsigned int pin, unsigned int arduinoPin, int value) {
-    writeMcp(pin, value);
-    return checkEqual(pin, value, digitalRead(arduinoPin), "mcp -> ard");
+  writeMcp(pin, value);
+  return checkEqual(pin, value, digitalRead(arduinoPin), "mcp -> ard");
 }
 
 boolean checkEachArduinoToMcp(unsigned int pin, unsigned int arduinoPin, int value) {
-    writeArduino(arduinoPin, value);
-    return checkEqual(pin, value, mcp.digitalRead(pin), "ard -> mcp");
+  writeArduino(arduinoPin, value);
+  return checkEqual(pin, value, mcp.digitalRead(pin), "ard -> mcp");
 }
 
 boolean forAllPins(boolean (*checker)(unsigned int, unsigned int, int), int value) {
@@ -122,32 +150,36 @@ void loop() {
   digitalWrite(PassPin, LOW);
   digitalWrite(FailPin, LOW);
   boolean passed = true;
-  
+
   Serial.println("MCP to Arduino"); 
   setMcpPinsMode(OUTPUT);
   setArduinoPinsMode(INPUT);  
   passed = passed 
-           && forAllPins(checkEachMcpToArduino, HIGH)
-           && forAllPins(checkEachMcpToArduino, LOW);
-  
+    && forAllPins(checkEachMcpToArduino, HIGH)
+    && forAllPins(checkEachMcpToArduino, LOW);
+
   Serial.println("Arduino to MCP"); 
   setMcpPinsMode(INPUT);
   setArduinoPinsMode(OUTPUT);
   passed = passed 
-           && forAllPins(checkEachArduinoToMcp, HIGH)
-           && forAllPins(checkEachArduinoToMcp, LOW);
-           
+    && forAllPins(checkEachArduinoToMcp, HIGH)
+    && forAllPins(checkEachArduinoToMcp, LOW);
+
   Serial.println("Interrupts"); 
   setMcpPinsMode(INPUT);
   pinMode(InterruptPin, INPUT);
 
   mcp.useActiveInterrupts(LOW);  
-  passed = passed && forAllPins(checkEachMcpSwitchedInterrupt, LOW);
+  passed = passed && forAllPins(checkEachMcpOnPinInterrupt, LOW);
 
   mcp.useActiveInterrupts(HIGH);  
-  passed = passed && forAllPins(checkEachMcpSwitchedInterrupt, HIGH);
+  passed = passed && forAllPins(checkEachMcpOnPinInterrupt, HIGH);
+
+  mcp.useActiveInterrupts(LOW);  
+  passed = passed && forAllPins(checkEachMcpOnRegisterChangeInterrupt, LOW);
 
   digitalWrite(passed ? PassPin : FailPin, HIGH);
   delay(500);
 }
+
 
