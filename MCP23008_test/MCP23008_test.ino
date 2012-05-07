@@ -1,6 +1,8 @@
 #include <Wire.h>
 #include <AdafruitMCP23008.h>
 
+
+
 // Test i/o expansion. 
 // Checks all 8 pins of MCP23008 as outputs then as inputs
 // Does not yet test pull ups or interrupts
@@ -146,37 +148,55 @@ boolean forAllPins(boolean (*checker)(unsigned int, unsigned int, int), int valu
   return passed;
 }
 
-void loop() {
-  digitalWrite(PassPin, LOW);
-  digitalWrite(FailPin, LOW);
-  boolean passed = true;
-
+boolean testMcpToArduino() {
   Serial.println("MCP to Arduino"); 
   setMcpPinsMode(OUTPUT);
   setArduinoPinsMode(INPUT);  
-  passed = passed 
-    && forAllPins(checkEachMcpToArduino, HIGH)
-    && forAllPins(checkEachMcpToArduino, LOW);
+  return forAllPins(checkEachMcpToArduino, HIGH)
+      && forAllPins(checkEachMcpToArduino, LOW);
+}
 
+boolean testArduinoToMcp() {
   Serial.println("Arduino to MCP"); 
   setMcpPinsMode(INPUT);
   setArduinoPinsMode(OUTPUT);
-  passed = passed 
-    && forAllPins(checkEachArduinoToMcp, HIGH)
-    && forAllPins(checkEachArduinoToMcp, LOW);
+  return forAllPins(checkEachArduinoToMcp, HIGH)
+      && forAllPins(checkEachArduinoToMcp, LOW);
+}
 
-  Serial.println("Interrupts"); 
+boolean testOnPinInterrupts() {
+  Serial.println("On pin interrupts"); 
   setMcpPinsMode(INPUT);
   pinMode(InterruptPin, INPUT);
 
   mcp.useActiveInterrupts(LOW);  
-  passed = passed && forAllPins(checkEachMcpOnPinInterrupt, LOW);
+  const boolean passed = forAllPins(checkEachMcpOnPinInterrupt, LOW);
 
   mcp.useActiveInterrupts(HIGH);  
-  passed = passed && forAllPins(checkEachMcpOnPinInterrupt, HIGH);
+  return passed && forAllPins(checkEachMcpOnPinInterrupt, HIGH);
+}
+
+boolean testOnRegisterInterrupts() {
+  Serial.println("On register interrupts"); 
+  setMcpPinsMode(INPUT);
+  pinMode(InterruptPin, INPUT);
 
   mcp.useActiveInterrupts(LOW);  
-  passed = passed && forAllPins(checkEachMcpOnRegisterChangeInterrupt, LOW);
+  const boolean passed = forAllPins(checkEachMcpOnRegisterChangeInterrupt, LOW);
+
+  mcp.useActiveInterrupts(HIGH); 
+  return passed && forAllPins(checkEachMcpOnRegisterChangeInterrupt, HIGH);
+}
+
+
+void loop() {
+  digitalWrite(PassPin, LOW);
+  digitalWrite(FailPin, LOW);
+  
+  boolean passed = testMcpToArduino()    
+                && testArduinoToMcp()
+                && testOnPinInterrupts() 
+                && testOnRegisterInterrupts();
 
   digitalWrite(passed ? PassPin : FailPin, HIGH);
   delay(500);
