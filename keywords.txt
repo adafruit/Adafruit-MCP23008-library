@@ -13,7 +13,8 @@ MCP23008	KEYWORD1
 #######################################
 
 pullUp	KEYWORD2
-
+writeGPIO	KEYWORD2
+readGPIO	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
