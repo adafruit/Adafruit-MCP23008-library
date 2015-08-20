@@ -14,6 +14,12 @@
 #ifndef _ADAFRUIT_MCP23008_H
 #define _ADAFRUIT_MCP23008_H
 // Don't forget the Wire library
+#ifdef __AVR_ATtiny85__
+  #include <TinyWireM.h>
+#else
+  #include <Wire.h>
+#endif
+
 class Adafruit_MCP23008 {
 public:
   void begin(uint8_t addr);
