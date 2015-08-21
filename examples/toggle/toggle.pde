@@ -1,11 +1,15 @@
 #include <Wire.h>
+// For Trinket uncomment include below and comment include above
+//#include <TinyWireM.h>
 #include "Adafruit_MCP23008.h"
 
 // Basic toggle test for i/o expansion. flips pin #0 of a MCP23008 i2c
 // pin expander up and down. Public domain
 
-// Connect pin #1 of the expander to Analog 5 (i2c clock)
+// Connect pin #1 of the expander to Analog 5 (i2c clock) 
+// i2c clock is pin #2 on Trinket and must have 4.7k pullup resistor
 // Connect pin #2 of the expander to Analog 4 (i2c data)
+// i2c data is pin #0 on Trinket and must have 4.7k pullup resistor
 // Connect pins #3, 4 and 5 of the expander to ground (address selection)
 // Connect pin #6 and 18 of the expander to 5V (power and reset disable)
 // Connect pin #9 of the expander to ground (common ground)
