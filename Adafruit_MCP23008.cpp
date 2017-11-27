@@ -156,6 +156,114 @@ uint8_t Adafruit_MCP23008::digitalRead(uint8_t p) {
   return (readGPIO() >> p) & 0x1;
 }
 
+void Adafruit_MCP23008::setInterruptOutPinMode(uint8_t mode) {
+  // Set the interrupt pin open-drain
+  uint8_t registerVal = read8(MCP23008_IOCON);
+
+  if (mode == MCP23008_INT_OUT_DRAIN) {
+    registerVal |= (1 << 2); // INTPOL = 1 (drain)
+  } else {
+    registerVal &= ~(1 << 2); // INTPOL = 0 (active driver)
+
+    if (mode == MCP23008_INT_OUT_HIGH) {
+      registerVal |= (1 << 1);
+    } else {
+      registerVal &= ~(1 << 1);
+    }
+  }
+
+  write8(MCP23008_IOCON, registerVal);
+}
+
+uint8_t Adafruit_MCP23008::readInterrupts() {
+  // Read which pins are active
+  // intf is a mask of pins with pending interrupts
+  uint8_t activeInterruptPins = read8(MCP23008_INTF);
+
+  uint8_t validInterrupts = 0;
+
+  // Read the captured interrupt mask which will also clear the interrupt
+  uint8_t capturedInterruptMask = read8(MCP23008_INTCAP);
+
+  uint8_t pinInterruptType;
+
+  for (uint8_t pin = 0; pin < 8; pin++) {
+    pinInterruptType = (capturedInterruptMask >> pin) & 1;
+
+    // If the pin in the active pins is 0 then we've no interrupt for this pin
+    if ((activeInterruptPins >> pin) & 1 == 0) {
+      continue;
+    }
+
+    if (this->interruptHandlers[pin] == RISING) {
+      if (pinInterruptType == 1) {
+        validInterrupts |= (1 << pin);
+      }
+    } else if (this->interruptHandlers[pin] == FALLING) {
+      if (pinInterruptType == 0) {
+        validInterrupts |= (1 << pin);
+      }
+    } else if (this->interruptHandlers[pin] == CHANGE) {
+      validInterrupts |= (1 << pin);
+    }
+  }
+
+  return validInterrupts;
+}
+
+void Adafruit_MCP23008::enableInterrupt(uint8_t pin, int mode) {
+  // Only 8 pins
+  if (pin > 7) { return; }
+
+  uint8_t registerVal;
+
+  // Save the handler type
+  interruptHandlers[pin] = mode;
+
+  // Enable interrupt for pin (Enable interrupt on change)
+  registerVal = read8(MCP23008_GPINTEN);
+  registerVal |= (1 << pin);
+  write8(MCP23008_GPINTEN, registerVal);
+
+  // Interrupt compare mode
+  // 0 = compare against previous
+  // 1 = compare against reference
+  registerVal = read8(MCP23008_INTCON);
+
+  if (mode == CHANGE || mode == RISING || mode == FALLING) {
+    registerVal &= ~(1 << pin);
+  } else {
+    registerVal |= (1 << pin);
+  }
+
+  write8(MCP23008_INTCON, registerVal);
+
+  // If we're not doing on change; doing compare to value isntead
+  // A interrupt will be triggered if the pin value IS NOT what this is set to
+  // This only has an effect when INTCON for pin is set to 1
+  registerVal = read8(MCP23008_DEFVAL);
+
+  if (mode == ONHIGH) {
+    registerVal &= ~(1 << pin);
+  } else {
+    registerVal |= (1 << pin);
+  }
+
+  write8(MCP23008_DEFVAL, registerVal);
+}
+
+void Adafruit_MCP23008::disableInterrupt(uint8_t pin) {
+  // Only 8 pins
+  if (pin > 7) { return; }
+
+  uint8_t registerVal;
+
+  // Turn off interrupt on change for the pin
+  registerVal = read8(MCP23008_GPINTEN);
+  registerVal &= ~(1 << pin);
+  write8(MCP23008_GPINTEN, registerVal);
+}
+
 uint8_t Adafruit_MCP23008::read8(uint8_t addr) {
   Wire.beginTransmission(MCP23008_ADDRESS | i2caddr);
 #if ARDUINO >= 100
