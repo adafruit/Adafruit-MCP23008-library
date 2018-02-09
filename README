@@ -2,9 +2,10 @@ To download, click "Download Source" in the top right corner. Then install as in
 --> http://www.ladyada.net/library/arduino/libraries.html
 in a folder called Adafruit_MCP23008.
 
-This is very much beta, it seems to work fine but its not optimized and doesn't currently suport the interrupt capability of the chip
+This is very much beta, it seems to work fine but its not optimized.
 
 Currently it can do: setting pin directions, inputs and outputs and turning on/off the pull-up resistors
+It now supports the interrupt capabilities as well as the IOCON configuration register.
 
 To use:
 Connect pin #1 of the expander to Analog 5 (i2c clock)
