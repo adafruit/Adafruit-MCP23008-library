@@ -139,7 +139,7 @@ void setup() {
   /* Setup our local interrupt handler */
   DEBUG_OUT(F("Config interrupt handler... "));
   pinMode(INTERRUPT_PIN, INPUT_PULLUP);
-  attachInterrupt(INTERRUPT_PIN, inputsHaveChanged, LOW);
+  attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), inputsHaveChanged, LOW);
 
   DEBUG_OUTLN(F("Setup complete."));
 
