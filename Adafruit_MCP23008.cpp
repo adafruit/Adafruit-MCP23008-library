@@ -20,7 +20,7 @@
   #include <TinyWireM.h>
   #define Wire TinyWireM
 #else
-  #include <Wire.h>
+#include <Wire.h>
 #endif
 
 #ifdef __AVR
@@ -35,12 +35,16 @@
 // RTC_DS1307 implementation
 
 void Adafruit_MCP23008::begin(uint8_t addr) {
+  begin(addr, SDA, SCL);
+}
+
+void Adafruit_MCP23008::begin(uint8_t addr, int sda_pin, int scl_pin) {
   if (addr > 7) {
     addr = 7;
   }
   i2caddr = addr;
 
-  Wire.begin();
+  Wire.begin(sda_pin, scl_pin);
 
   // set defaults!
   Wire.beginTransmission(MCP23008_ADDRESS | i2caddr);
@@ -74,7 +78,11 @@ void Adafruit_MCP23008::begin(uint8_t addr) {
 }
 
 void Adafruit_MCP23008::begin(void) {
-  begin(0);
+  begin(0, SDA, SCL);
+}
+
+void Adafruit_MCP23008::begin(int sda_pin, int scl_pin) {
+  begin(0, sda_pin, scl_pin);
 }
 
 void Adafruit_MCP23008::pinMode(uint8_t p, uint8_t d) {
