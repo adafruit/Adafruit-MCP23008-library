@@ -32,10 +32,14 @@ public:
   uint8_t readGPIO(void);
   void writeGPIO(uint8_t);
 
+  void setWire(TwoWire *wire);
+
  private:
   uint8_t i2caddr;
   uint8_t read8(uint8_t addr);
   void write8(uint8_t addr, uint8_t data);
+
+  TwoWire *m_wire;
 };
 
 #define MCP23008_ADDRESS 0x20
