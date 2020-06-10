@@ -31,14 +31,16 @@ public:
   uint8_t digitalRead(uint8_t p);
   uint8_t readGPIO(void);
   void writeGPIO(uint8_t);
+  void setInterrupts(uint8_t data);
 
   void setWire(TwoWire *wire);
 
- private:
+protected:
   uint8_t i2caddr;
   uint8_t read8(uint8_t addr);
   void write8(uint8_t addr, uint8_t data);
 
+private:
   TwoWire *m_wire;
 };
 

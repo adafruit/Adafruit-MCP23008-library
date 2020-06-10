@@ -157,6 +157,10 @@ uint8_t Adafruit_MCP23008::digitalRead(uint8_t p) {
   return (readGPIO() >> p) & 0x1;
 }
 
+void Adafruit_MCP23008::setInterrupts(uint8_t data) {
+  write8(MCP23008_GPINTEN, data);
+}
+
 uint8_t Adafruit_MCP23008::read8(uint8_t addr) {
   m_wire->beginTransmission(MCP23008_ADDRESS | i2caddr);
 #if ARDUINO >= 100
