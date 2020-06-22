@@ -1,3 +1,5 @@
+# Adafruit MCP23008 Library [![Build Status](https://github.com/adafruit/Adafruit-MCP23008-library/workflows/Arduino%20Library%20CI/badge.svg)](https://github.com/adafruit/Adafruit-MCP23008-library/actions)[![Documentation](https://github.com/adafruit/ci-arduino/blob/master/assets/doxygen_badge.svg)](http://adafruit.github.io/Adafruit-MCP23008-library/html/index.html)
+
 To download, click "Download Source" in the top right corner. Then install as indicated in our tutorial:
 --> http://www.ladyada.net/library/arduino/libraries.html
 in a folder called Adafruit_MCP23008.
