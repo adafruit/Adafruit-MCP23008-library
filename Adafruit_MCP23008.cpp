@@ -22,74 +22,56 @@
  * BSD license, all text above must be included in any redistribution
  */
 
-#if ARDUINO >= 100
-#include "Arduino.h"
-#else
-#include "WProgram.h"
-#endif
-#ifdef __AVR_ATtiny85__
-#include <TinyWireM.h>
-#define Wire TinyWireM
-#else
-#include <Wire.h>
-#endif
 
-#ifdef __AVR
-#include <avr/pgmspace.h>
-#elif defined(ESP8266)
-#include <pgmspace.h>
-#endif
 #include "Adafruit_MCP23008.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // RTC_DS1307 implementation
 
-void Adafruit_MCP23008::begin(uint8_t addr) {
-  if (addr > 7) {
-    addr = 7;
+bool Adafruit_MCP23008::begin(uint8_t addr, TwoWire *wire) {
+  if ((addr >= 0x20) && (addr <= 0x27)) {
+    _i2caddr = addr;
+  } else if (addr <= 0x07) {
+    _i2caddr = 0x20 + addr;
+  } else {
+    _i2caddr = 0x27;
   }
-  i2caddr = addr;
 
-  Wire.begin();
+  if (i2c_dev) {
+    delete i2c_dev; // remove old interface
+  }
+
+  i2c_dev = new Adafruit_I2CDevice(_i2caddr, wire);
+
+  if (!i2c_dev->begin()) {
+    return false;
+  }
 
   // set defaults!
-  Wire.beginTransmission(MCP23008_ADDRESS | i2caddr);
-#if ARDUINO >= 100
-  Wire.write((byte)MCP23008_IODIR);
-  Wire.write((byte)0xFF); // all inputs
-  Wire.write((byte)0x00);
-  Wire.write((byte)0x00);
-  Wire.write((byte)0x00);
-  Wire.write((byte)0x00);
-  Wire.write((byte)0x00);
-  Wire.write((byte)0x00);
-  Wire.write((byte)0x00);
-  Wire.write((byte)0x00);
-  Wire.write((byte)0x00);
-#else
-  Wire.send(MCP23008_IODIR);
-  Wire.send(0xFF); // all inputs
-  Wire.send(0x00);
-  Wire.send(0x00);
-  Wire.send(0x00);
-  Wire.send(0x00);
-  Wire.send(0x00);
-  Wire.send(0x00);
-  Wire.send(0x00);
-  Wire.send(0x00);
-  Wire.send(0x00);
-#endif
-  Wire.endTransmission();
+  uint8_t buf[] = {MCP23008_IODIR, 
+                   0xFF, // all inputs
+                   0x00,
+                   0x00,
+                   0x00,
+                   0x00,
+                   0x00,
+                   0x00,
+                   0x00,
+                   0x00,
+                   0x00};
+  if (! i2c_dev->write(buf, 10)) {
+    return false;
+  }
+
+  return true;
 }
 
-void Adafruit_MCP23008::begin(void) { begin(0); }
-
-void Adafruit_MCP23008::pinMode(uint8_t p, uint8_t d) {
+bool Adafruit_MCP23008::pinMode(uint8_t p, uint8_t d) {
   uint8_t iodir;
 
   // only 8 bits!
   if (p > 7)
-    return;
+    return false;
 
   iodir = read8(MCP23008_IODIR);
 
@@ -101,7 +83,7 @@ void Adafruit_MCP23008::pinMode(uint8_t p, uint8_t d) {
   }
 
   // write the new IODIR
-  write8(MCP23008_IODIR, iodir);
+  return write8(MCP23008_IODIR, iodir);
 }
 
 uint8_t Adafruit_MCP23008::readGPIO(void) {
@@ -109,14 +91,16 @@ uint8_t Adafruit_MCP23008::readGPIO(void) {
   return read8(MCP23008_GPIO);
 }
 
-void Adafruit_MCP23008::writeGPIO(uint8_t gpio) { write8(MCP23008_GPIO, gpio); }
+bool Adafruit_MCP23008::writeGPIO(uint8_t gpio) { 
+  return write8(MCP23008_GPIO, gpio); 
+}
 
-void Adafruit_MCP23008::digitalWrite(uint8_t p, uint8_t d) {
+bool Adafruit_MCP23008::digitalWrite(uint8_t p, uint8_t d) {
   uint8_t gpio;
 
   // only 8 bits!
   if (p > 7)
-    return;
+    return false;
 
   // read the current GPIO output latches
   gpio = readGPIO();
@@ -129,15 +113,15 @@ void Adafruit_MCP23008::digitalWrite(uint8_t p, uint8_t d) {
   }
 
   // write the new GPIO
-  writeGPIO(gpio);
+  return writeGPIO(gpio);
 }
 
-void Adafruit_MCP23008::pullUp(uint8_t p, uint8_t d) {
+bool Adafruit_MCP23008::pullUp(uint8_t p, uint8_t d) {
   uint8_t gppu;
 
   // only 8 bits!
   if (p > 7)
-    return;
+    return false;
 
   gppu = read8(MCP23008_GPPU);
   // set the pin and direction
@@ -147,7 +131,7 @@ void Adafruit_MCP23008::pullUp(uint8_t p, uint8_t d) {
     gppu &= ~(1 << p);
   }
   // write the new GPIO
-  write8(MCP23008_GPPU, gppu);
+  return write8(MCP23008_GPPU, gppu);
 }
 
 uint8_t Adafruit_MCP23008::digitalRead(uint8_t p) {
@@ -160,30 +144,14 @@ uint8_t Adafruit_MCP23008::digitalRead(uint8_t p) {
 }
 
 uint8_t Adafruit_MCP23008::read8(uint8_t addr) {
-  Wire.beginTransmission(MCP23008_ADDRESS | i2caddr);
-#if ARDUINO >= 100
-  Wire.write((byte)addr);
-#else
-  Wire.send(addr);
-#endif
-  Wire.endTransmission();
-  Wire.requestFrom(MCP23008_ADDRESS | i2caddr, 1);
-
-#if ARDUINO >= 100
-  return Wire.read();
-#else
-  return Wire.receive();
-#endif
+  Adafruit_BusIO_Register reg = 
+    Adafruit_BusIO_Register(i2c_dev, addr, 1);
+  return reg.read();
 }
 
-void Adafruit_MCP23008::write8(uint8_t addr, uint8_t data) {
-  Wire.beginTransmission(MCP23008_ADDRESS | i2caddr);
-#if ARDUINO >= 100
-  Wire.write((byte)addr);
-  Wire.write((byte)data);
-#else
-  Wire.send(addr);
-  Wire.send(data);
-#endif
-  Wire.endTransmission();
+bool Adafruit_MCP23008::write8(uint8_t addr, uint8_t data) {
+  Adafruit_BusIO_Register reg = 
+    Adafruit_BusIO_Register(i2c_dev, addr, 1);
+
+  return reg.write(data);
 }
