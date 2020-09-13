@@ -4,6 +4,8 @@ To download, click "Download Source" in the top right corner. Then install as in
 --> http://www.ladyada.net/library/arduino/libraries.html
 in a folder called Adafruit_MCP23008.
 
+You will also need the Adafruit BusIO library: https://github.com/adafruit/Adafruit_BusIO
+
 This is very much beta, it seems to work fine but its not optimized and doesn't currently suport the interrupt capability of the chip
 
 Currently it can do: setting pin directions, inputs and outputs and turning on/off the pull-up resistors
