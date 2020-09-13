@@ -73,47 +73,53 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a8314a25b377985de7ce5e3b5e7455372"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___m_c_p23008.html#a8314a25b377985de7ce5e3b5e7455372">begin</a> (uint8_t addr)</td></tr>
-<tr class="memdesc:a8314a25b377985de7ce5e3b5e7455372"><td class="mdescLeft">&#160;</td><td class="mdescRight">Begins the i2c connection using specified address.  <a href="#a8314a25b377985de7ce5e3b5e7455372">More...</a><br /></td></tr>
-<tr class="separator:a8314a25b377985de7ce5e3b5e7455372"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af3987b6fb1535161dc7ba6b7128728ab"><td class="memItemLeft" align="right" valign="top"><a id="af3987b6fb1535161dc7ba6b7128728ab"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___m_c_p23008.html#af3987b6fb1535161dc7ba6b7128728ab">begin</a> (void)</td></tr>
-<tr class="memdesc:af3987b6fb1535161dc7ba6b7128728ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Begins the i2c connection using default address. <br /></td></tr>
-<tr class="separator:af3987b6fb1535161dc7ba6b7128728ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4b0ecc269a2f8a7a837d6f9bece20caf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___m_c_p23008.html#a4b0ecc269a2f8a7a837d6f9bece20caf">pinMode</a> (uint8_t p, uint8_t d)</td></tr>
-<tr class="memdesc:a4b0ecc269a2f8a7a837d6f9bece20caf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the pin mode.  <a href="#a4b0ecc269a2f8a7a837d6f9bece20caf">More...</a><br /></td></tr>
-<tr class="separator:a4b0ecc269a2f8a7a837d6f9bece20caf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3e68d889e4ae288b73055dd0e685e3e3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___m_c_p23008.html#a3e68d889e4ae288b73055dd0e685e3e3">digitalWrite</a> (uint8_t p, uint8_t d)</td></tr>
-<tr class="memdesc:a3e68d889e4ae288b73055dd0e685e3e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the pin and direction.  <a href="#a3e68d889e4ae288b73055dd0e685e3e3">More...</a><br /></td></tr>
-<tr class="separator:a3e68d889e4ae288b73055dd0e685e3e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5e2c6d20e8a3e81af47bb9ec47d707b1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___m_c_p23008.html#a5e2c6d20e8a3e81af47bb9ec47d707b1">pullUp</a> (uint8_t p, uint8_t d)</td></tr>
-<tr class="memdesc:a5e2c6d20e8a3e81af47bb9ec47d707b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets pull-up resistor on specified pin.  <a href="#a5e2c6d20e8a3e81af47bb9ec47d707b1">More...</a><br /></td></tr>
-<tr class="separator:a5e2c6d20e8a3e81af47bb9ec47d707b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a529eb9ec0408c4ba8c4e44fc8cf6cf4c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___m_c_p23008.html#a529eb9ec0408c4ba8c4e44fc8cf6cf4c">begin</a> (uint8_t addr=0x20, TwoWire *wire=&amp;Wire)</td></tr>
+<tr class="memdesc:a529eb9ec0408c4ba8c4e44fc8cf6cf4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Begins the i2c connection using specified address.  <a href="#a529eb9ec0408c4ba8c4e44fc8cf6cf4c">More...</a><br /></td></tr>
+<tr class="separator:a529eb9ec0408c4ba8c4e44fc8cf6cf4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6eea449d404ba09f235557168e1d1880"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___m_c_p23008.html#a6eea449d404ba09f235557168e1d1880">pinMode</a> (uint8_t p, uint8_t d)</td></tr>
+<tr class="memdesc:a6eea449d404ba09f235557168e1d1880"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the pin mode.  <a href="#a6eea449d404ba09f235557168e1d1880">More...</a><br /></td></tr>
+<tr class="separator:a6eea449d404ba09f235557168e1d1880"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e2f820bf1f9d2f046d51461f6403c26"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___m_c_p23008.html#a8e2f820bf1f9d2f046d51461f6403c26">digitalWrite</a> (uint8_t p, uint8_t d)</td></tr>
+<tr class="memdesc:a8e2f820bf1f9d2f046d51461f6403c26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the pin and direction.  <a href="#a8e2f820bf1f9d2f046d51461f6403c26">More...</a><br /></td></tr>
+<tr class="separator:a8e2f820bf1f9d2f046d51461f6403c26"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9756662d3c83a0ebd7911fca56bbaf0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___m_c_p23008.html#af9756662d3c83a0ebd7911fca56bbaf0">pullUp</a> (uint8_t p, uint8_t d)</td></tr>
+<tr class="memdesc:af9756662d3c83a0ebd7911fca56bbaf0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets pull-up resistor on specified pin.  <a href="#af9756662d3c83a0ebd7911fca56bbaf0">More...</a><br /></td></tr>
+<tr class="separator:af9756662d3c83a0ebd7911fca56bbaf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a51d5f3149d92245cca9b3429456edce5"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___m_c_p23008.html#a51d5f3149d92245cca9b3429456edce5">digitalRead</a> (uint8_t p)</td></tr>
 <tr class="memdesc:a51d5f3149d92245cca9b3429456edce5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the status of a gpio pin.  <a href="#a51d5f3149d92245cca9b3429456edce5">More...</a><br /></td></tr>
 <tr class="separator:a51d5f3149d92245cca9b3429456edce5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a83c2886cdd47924a628f5bd42560748b"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___m_c_p23008.html#a83c2886cdd47924a628f5bd42560748b">readGPIO</a> (void)</td></tr>
 <tr class="memdesc:a83c2886cdd47924a628f5bd42560748b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the current GPIO input.  <a href="#a83c2886cdd47924a628f5bd42560748b">More...</a><br /></td></tr>
 <tr class="separator:a83c2886cdd47924a628f5bd42560748b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03b271a8a8e9bb8b8289a57cea5d328f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___m_c_p23008.html#a03b271a8a8e9bb8b8289a57cea5d328f">writeGPIO</a> (uint8_t)</td></tr>
-<tr class="memdesc:a03b271a8a8e9bb8b8289a57cea5d328f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes to the GPIO.  <a href="#a03b271a8a8e9bb8b8289a57cea5d328f">More...</a><br /></td></tr>
-<tr class="separator:a03b271a8a8e9bb8b8289a57cea5d328f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a424a54e8fc6c9f62e96442c7661048fc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___m_c_p23008.html#a424a54e8fc6c9f62e96442c7661048fc">writeGPIO</a> (uint8_t)</td></tr>
+<tr class="memdesc:a424a54e8fc6c9f62e96442c7661048fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes to the GPIO.  <a href="#a424a54e8fc6c9f62e96442c7661048fc">More...</a><br /></td></tr>
+<tr class="separator:a424a54e8fc6c9f62e96442c7661048fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class that stores state and functions for interacting with MCP23008 chip. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a8314a25b377985de7ce5e3b5e7455372"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8314a25b377985de7ce5e3b5e7455372">&#9670;&nbsp;</a></span>begin()</h2>
+<a id="a529eb9ec0408c4ba8c4e44fc8cf6cf4c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a529eb9ec0408c4ba8c4e44fc8cf6cf4c">&#9670;&nbsp;</a></span>begin()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void Adafruit_MCP23008::begin </td>
+          <td class="memname">bool Adafruit_MCP23008::begin </td>
           <td>(</td>
           <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>addr</em></td><td>)</td>
+          <td class="paramname"><em>addr</em> = <code>0x20</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">TwoWire *&#160;</td>
+          <td class="paramname"><em>wire</em> = <code>&amp;Wire</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -121,21 +127,23 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <p>Begins the i2c connection using specified address. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">addr</td><td>i2c address of the MCP23008 </td></tr>
+    <tr><td class="paramname">addr</td><td>i2c address of the MCP23008, defaults to 0x20 </td></tr>
+    <tr><td class="paramname">wire</td><td>TwoWire interface, defaults to &amp;Wire </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>False if failed to find device at address </dd></dl>
 
 </div>
 </div>
-<a id="a4b0ecc269a2f8a7a837d6f9bece20caf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4b0ecc269a2f8a7a837d6f9bece20caf">&#9670;&nbsp;</a></span>pinMode()</h2>
+<a id="a6eea449d404ba09f235557168e1d1880"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6eea449d404ba09f235557168e1d1880">&#9670;&nbsp;</a></span>pinMode()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void Adafruit_MCP23008::pinMode </td>
+          <td class="memname">bool Adafruit_MCP23008::pinMode </td>
           <td>(</td>
           <td class="paramtype">uint8_t&#160;</td>
           <td class="paramname"><em>p</em>, </td>
@@ -162,17 +170,18 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>True on success, False on bad input or I2C failure </dd></dl>
 
 </div>
 </div>
-<a id="a3e68d889e4ae288b73055dd0e685e3e3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3e68d889e4ae288b73055dd0e685e3e3">&#9670;&nbsp;</a></span>digitalWrite()</h2>
+<a id="a8e2f820bf1f9d2f046d51461f6403c26"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8e2f820bf1f9d2f046d51461f6403c26">&#9670;&nbsp;</a></span>digitalWrite()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void Adafruit_MCP23008::digitalWrite </td>
+          <td class="memname">bool Adafruit_MCP23008::digitalWrite </td>
           <td>(</td>
           <td class="paramtype">uint8_t&#160;</td>
           <td class="paramname"><em>p</em>, </td>
@@ -199,17 +208,18 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>True on success, False on bad input or I2C failure </dd></dl>
 
 </div>
 </div>
-<a id="a5e2c6d20e8a3e81af47bb9ec47d707b1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5e2c6d20e8a3e81af47bb9ec47d707b1">&#9670;&nbsp;</a></span>pullUp()</h2>
+<a id="af9756662d3c83a0ebd7911fca56bbaf0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af9756662d3c83a0ebd7911fca56bbaf0">&#9670;&nbsp;</a></span>pullUp()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void Adafruit_MCP23008::pullUp </td>
+          <td class="memname">bool Adafruit_MCP23008::pullUp </td>
           <td>(</td>
           <td class="paramtype">uint8_t&#160;</td>
           <td class="paramname"><em>p</em>, </td>
@@ -236,6 +246,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>True on success, False on bad input or I2C failure </dd></dl>
 
 </div>
 </div>
@@ -287,14 +298,14 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 
 </div>
 </div>
-<a id="a03b271a8a8e9bb8b8289a57cea5d328f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a03b271a8a8e9bb8b8289a57cea5d328f">&#9670;&nbsp;</a></span>writeGPIO()</h2>
+<a id="a424a54e8fc6c9f62e96442c7661048fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a424a54e8fc6c9f62e96442c7661048fc">&#9670;&nbsp;</a></span>writeGPIO()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void Adafruit_MCP23008::writeGPIO </td>
+          <td class="memname">bool Adafruit_MCP23008::writeGPIO </td>
           <td>(</td>
           <td class="paramtype">uint8_t&#160;</td>
           <td class="paramname"><em>gpio</em></td><td>)</td>
@@ -310,6 +321,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>True on success, False on bad input or I2C failure </dd></dl>
 
 </div>
 </div>
