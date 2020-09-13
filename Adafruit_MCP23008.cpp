@@ -22,12 +22,16 @@
  * BSD license, all text above must be included in any redistribution
  */
 
-
 #include "Adafruit_MCP23008.h"
 
-////////////////////////////////////////////////////////////////////////////////
-// RTC_DS1307 implementation
+///////////////////////////////////////////////////////////////////////////////
 
+/*!
+ * @brief Begins the i2c connection using specified address
+ * @param addr i2c address of the MCP23008, defaults to 0x20
+ * @param wire TwoWire interface, defaults to &Wire
+ * @returns False if failed to find device at address
+ */
 bool Adafruit_MCP23008::begin(uint8_t addr, TwoWire *wire) {
   if ((addr >= 0x20) && (addr <= 0x27)) {
     _i2caddr = addr;
@@ -48,24 +52,23 @@ bool Adafruit_MCP23008::begin(uint8_t addr, TwoWire *wire) {
   }
 
   // set defaults!
-  uint8_t buf[] = {MCP23008_IODIR, 
+  uint8_t buf[] = {MCP23008_IODIR,
                    0xFF, // all inputs
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00,
-                   0x00};
-  if (! i2c_dev->write(buf, 10)) {
+                   0x00,           0x00, 0x00, 0x00, 0x00,
+                   0x00,           0x00, 0x00, 0x00};
+  if (!i2c_dev->write(buf, 10)) {
     return false;
   }
 
   return true;
 }
 
+/*!
+ * @brief Sets the pin mode
+ * @param p Mode to set
+ * @param d Pin to set the mode to
+ * @returns True on success, False on bad input or I2C failure
+ */
 bool Adafruit_MCP23008::pinMode(uint8_t p, uint8_t d) {
   uint8_t iodir;
 
@@ -86,15 +89,30 @@ bool Adafruit_MCP23008::pinMode(uint8_t p, uint8_t d) {
   return write8(MCP23008_IODIR, iodir);
 }
 
+/*!
+ * @brief Reads the current GPIO input
+ * @return Returns the current GPIO input
+ */
 uint8_t Adafruit_MCP23008::readGPIO(void) {
   // read the current GPIO input
   return read8(MCP23008_GPIO);
 }
 
-bool Adafruit_MCP23008::writeGPIO(uint8_t gpio) { 
-  return write8(MCP23008_GPIO, gpio); 
+/*!
+ * @brief Writes to the GPIO
+ * @param gpio what to write
+ * @returns True on success, False on bad input or I2C failure
+ */
+bool Adafruit_MCP23008::writeGPIO(uint8_t gpio) {
+  return write8(MCP23008_GPIO, gpio);
 }
 
+/*!
+ * @brief Sets the pin and direction
+ * @param p Pin to set
+ * @param d Direction to set the pin
+ * @returns True on success, False on bad input or I2C failure
+ */
 bool Adafruit_MCP23008::digitalWrite(uint8_t p, uint8_t d) {
   uint8_t gpio;
 
@@ -116,6 +134,12 @@ bool Adafruit_MCP23008::digitalWrite(uint8_t p, uint8_t d) {
   return writeGPIO(gpio);
 }
 
+/*!
+ * @brief Sets pull-up resistor on specified pin
+ * @param p Pin to set
+ * @param d Direction to set the pin
+ * @returns True on success, False on bad input or I2C failure
+ */
 bool Adafruit_MCP23008::pullUp(uint8_t p, uint8_t d) {
   uint8_t gppu;
 
@@ -134,6 +158,11 @@ bool Adafruit_MCP23008::pullUp(uint8_t p, uint8_t d) {
   return write8(MCP23008_GPPU, gppu);
 }
 
+/*!
+ * @brief Reads the status of a gpio pin
+ * @param p Pin to read
+ * @return Returns the current gpio
+ */
 uint8_t Adafruit_MCP23008::digitalRead(uint8_t p) {
   // only 8 bits!
   if (p > 7)
@@ -144,14 +173,12 @@ uint8_t Adafruit_MCP23008::digitalRead(uint8_t p) {
 }
 
 uint8_t Adafruit_MCP23008::read8(uint8_t addr) {
-  Adafruit_BusIO_Register reg = 
-    Adafruit_BusIO_Register(i2c_dev, addr, 1);
+  Adafruit_BusIO_Register reg = Adafruit_BusIO_Register(i2c_dev, addr, 1);
   return reg.read();
 }
 
 bool Adafruit_MCP23008::write8(uint8_t addr, uint8_t data) {
-  Adafruit_BusIO_Register reg = 
-    Adafruit_BusIO_Register(i2c_dev, addr, 1);
+  Adafruit_BusIO_Register reg = Adafruit_BusIO_Register(i2c_dev, addr, 1);
 
   return reg.write(data);
 }

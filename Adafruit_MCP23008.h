@@ -5,8 +5,8 @@
 #ifndef _ADAFRUIT_MCP23008_H
 #define _ADAFRUIT_MCP23008_H
 
-#include <Adafruit_I2CDevice.h>
 #include <Adafruit_BusIO_Register.h>
+#include <Adafruit_I2CDevice.h>
 #include <Arduino.h>
 
 /*!
@@ -15,49 +15,16 @@
  */
 class Adafruit_MCP23008 {
 public:
-  /*!
-   * @brief Begins the i2c connection using specified address
-   * @param addr i2c address of the MCP23008, defaults to 0x20
-   * @param wire TwoWire interface, defaults to &Wire
-   */
-  bool begin(uint8_t addr=0x20, TwoWire *wire = &Wire);
+  bool begin(uint8_t addr = 0x20, TwoWire *wire = &Wire);
 
-  /*!
-   * @brief Sets the pin mode
-   * @param p Mode to set
-   * @param d Pin to set the mode to
-   */
   bool pinMode(uint8_t p, uint8_t d);
-  /*!
-   * @brief Sets the pin and direction
-   * @param p Pin to set
-   * @param d Direction to set the pin
-   */
   bool digitalWrite(uint8_t p, uint8_t d);
-  /*!
-   * @brief Sets pull-up resistor on specified pin
-   * @param p Pin to set
-   * @param d Direction to set the pin
-   */
   bool pullUp(uint8_t p, uint8_t d);
-  /*!
-   * @brief Reads the status of a gpio pin
-   * @param p Pin to read
-   * @return Returns the current gpio
-   */
   uint8_t digitalRead(uint8_t p);
-  /*!
-   * @brief Reads the current GPIO input
-   * @return Returns the current GPIO input
-   */
   uint8_t readGPIO(void);
-  /*!
-   * @brief Writes to the GPIO
-   * @param gpio what to write
-   */
   bool writeGPIO(uint8_t);
 
-protected:
+private:
   Adafruit_I2CDevice *i2c_dev = NULL; ///< Pointer to I2C bus interface
 
   uint8_t _i2caddr;
