@@ -1,3 +1,7 @@
+# ARCHIVED !!!
+This library has been archived. Please use the replacement library:
+https://github.com/adafruit/Adafruit-MCP23017-Arduino-Library
+
 # Adafruit MCP23008 Library [![Build Status](https://github.com/adafruit/Adafruit-MCP23008-library/workflows/Arduino%20Library%20CI/badge.svg)](https://github.com/adafruit/Adafruit-MCP23008-library/actions)[![Documentation](https://github.com/adafruit/ci-arduino/blob/master/assets/doxygen_badge.svg)](http://adafruit.github.io/Adafruit-MCP23008-library/html/index.html)
 
 To download, click "Download Source" in the top right corner. Then install as indicated in our tutorial:
